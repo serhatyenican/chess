@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: chess
+  # Local dev: load DB settings from the git-ignored .env file (shared with docker-compose).
+  # In CI and production, the same names come from real environment variables.
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:chess}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
