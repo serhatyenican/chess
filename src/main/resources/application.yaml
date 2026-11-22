@@ -15,5 +15,6 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway owns the schema (ADR 0005); Hibernate only checks that entities match it.
+      ddl-auto: validate
     show-sql: true
