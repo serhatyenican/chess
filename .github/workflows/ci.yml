@@ -28,7 +28,7 @@ jobs:
           java-version: 25
 
       - name: Set up Gradle (with caching)
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       # Tests use Testcontainers: Docker is preinstalled on GitHub's Ubuntu runners.
       - name: Build and run tests
