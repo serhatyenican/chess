@@ -14,7 +14,7 @@ settled choices or silently drift from them.
 3. **Architecture Decision Records** (one short, immutable file per decision): small, dated, versioned with the code.
 
 ## Decision
-Use ADRs in `docs/adr/`, following Michael Nygard's format (context, options, decision, consequences).
+Use ADRs in `docs/adr/` with four sections: context, options, decision, consequences.
 
 ## Consequences
 - Every significant technical choice gets a half-page ADR in the same PR that introduces it.
