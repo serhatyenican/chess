@@ -7,20 +7,22 @@ Not commercial. Priority is learning by doing: modern development practices and
 AI-assisted development workflows. Explain key decisions and trade-offs as you work.
 
 ## Tech stack
-- Backend: Java 25, Spring Boot 4, Gradle (Groovy DSL)
-- Database: PostgreSQL (local via docker-compose)
-- Frontend: React + Vite + TypeScript (planned, ADR 0006)
-- Real-time: WebSockets with STOMP (ADR 0003)
-- Version control and planning: GitHub, GitHub Issues, GitHub Projects board, GitHub Actions CI
-- Later: Docker and cloud deployment
+See `docs/adr/` for the reasoning behind each choice.
+- Backend: Java 25, Spring Boot 4 (Spring MVC with virtual threads), Gradle (Groovy DSL)
+- API: REST in v1; WebSockets with STOMP added in v2 for two-player games
+- Chess engine: our own, pure Java, in `org.srt.chess.engine` (no Spring imports)
+- Database: PostgreSQL, Spring Data JPA, Flyway migrations (`ddl-auto: validate`); local DB via docker-compose
+- Frontend: React + Vite + TypeScript with react-chessboard, in `frontend/`
+- Tests: JUnit 5 + AssertJ (engine), Testcontainers (Spring/DB), Vitest + React Testing Library (frontend)
+- Planning and CI: GitHub Issues and milestones, GitHub Projects board, GitHub Actions
 - Base package: `org.srt.chess`
 
 ## Key decisions
-- First game type: online player vs player. Other game types and variants come later.
+- Game types, in build order: solo (v1), two players via a shared link (v2), against a bot (v3).
 - No user accounts in the first version: games are joined through a shareable link.
   Accounts and login come in a later phase.
 - The server is the authority on chess rules and validates every move.
-- REST endpoints handle the game lifecycle; WebSockets handle live moves.
+- REST endpoints handle the game lifecycle and moves; from v2, WebSockets push moves to the opponent.
 - Work is tracked as GitHub issues, one per task, grouped into a milestone per phase.
 - Configuration and secrets come from environment variables. Locally they live in a
   git-ignored `.env` file (template: `.env.example`), read by both docker-compose and Spring Boot.
@@ -29,9 +31,11 @@ AI-assisted development workflows. Explain key decisions and trade-offs as you w
 Read `docs/adr/` before changing the stack or structure. Record new significant decisions there as a new ADR.
 
 ## Roadmap
-Milestones M1 to M7 and their issues are tracked on GitHub:
-M1 Foundation, M2 Engine basics, M3 Walking skeleton (first playable game), M4 Full rules,
-M5 Game flow and mobile UX, M6 Ship it, M7 Extras.
+Version 1: a solo game (one person moves both sides) in a desktop browser, running locally. Every move is stored,
+games can be resumed via their link, and "Leave game" ends a game. No accounts, no time limit, no mobile layout yet.
+Milestones: v1 · M1 Foundation, v1 · M2 Chess rules, v1 · M3 Game API and storage, v1 · M4 Board in the browser.
+Later versions (planned as labelled issues, not detailed yet): v2 two players via link, v3 bot, then timed games,
+accounts and friends, and mobile.
 
 ## Working conventions
 - Small, focused changes with tests.
