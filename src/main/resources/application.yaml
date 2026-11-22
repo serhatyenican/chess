@@ -5,6 +5,10 @@ spring:
   # In CI and production, the same names come from real environment variables.
   config:
     import: optional:file:.env[.properties]
+  # ADR 0002: Spring MVC on virtual threads
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:chess}
     username: ${POSTGRES_USER}
