@@ -1,0 +1,17 @@
+# Dependabot opens a PR when a dependency has a newer version.
+# CI runs on each PR: green means the update is probably safe to merge.
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
