@@ -43,5 +43,6 @@ accounts and friends, and mobile.
 - One GitHub issue per task. Branch name `<issue-number>-short-name`, PR description says `Closes #<n>`.
 - Feature branches and pull requests into `main`, reviewed before merging. CI must be green.
 - Tests that need the database use Testcontainers (`@Import(TestcontainersConfiguration.class)`); engine tests are plain JUnit.
+- Schema changes are new Flyway migrations `V<n>__description.sql` in `src/main/resources/db/migration`; never edit a merged one.
 - Never commit secrets. Never put passwords in `application.yaml` or `docker-compose.yml`.
 - Keep this file up to date with conventions and decisions.
