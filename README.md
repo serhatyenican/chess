@@ -22,7 +22,11 @@ docker compose up -d          # starts Postgres
 ./gradlew bootRun             # starts the app on http://localhost:8080
 ```
 
-Run the tests with `./gradlew test`.
+Run the tests with `./gradlew test`. Tests start their own throwaway Postgres with
+[Testcontainers](https://testcontainers.com), so they only need Docker running, not the `.env` database.
+
+Alternatively, `./gradlew bootTestRun` starts the app against a Testcontainers Postgres,
+without docker-compose.
 
 ## License
 
