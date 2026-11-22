@@ -1,23 +1,23 @@
-# 0006. React with Vite and TypeScript for the frontend
+# 0006. React, Vite, TypeScript and react-chessboard, in the same repo
 
 - Status: Accepted
 - Date: 2026-11-22
 
 ## Context
-We need a browser chessboard that works on desktop and mobile. Serhat knows some React and Angular, and wants to
-learn React properly.
+We need a chessboard in a desktop browser for v1. Serhat knows some React and Angular, and wants to learn React properly.
 
 ## Options
-- Framework: **React** (learning goal, huge ecosystem, chessboard components available) vs. Angular (already known)
-  vs. plain HTML/JS or server-rendered Thymeleaf (less to learn, but a poor fit for a live board).
-- Tooling: **Vite** (fast dev server, the current standard for single-page apps) vs. Next.js (adds server rendering,
-  which we don't need, because Spring is the backend).
-- Language: **TypeScript** (types for game messages and API responses catch mistakes early) vs. JavaScript.
+- Build tool: **Vite** (fast, the current standard for single-page apps) vs. Next.js (adds server rendering and its
+  own backend, which we don't need, since Spring is the backend).
+- Language: **TypeScript** (types catch mistakes in API data early, and it feels familiar coming from Java) vs. JavaScript.
+- Board: **react-chessboard** (draws the board, pieces and drag-and-drop) vs. building our own (good practice, but slow).
+- Location: **`frontend/` in this repo** (one issue list, one PR for full-stack changes) vs. a separate repo.
 
 ## Decision
-React + Vite + TypeScript, in a `frontend/` folder of this repo.
+React + Vite + TypeScript with react-chessboard, in `frontend/`. During development, Vite proxies API calls to
+Spring on port 8080.
 
 ## Consequences
-- One repo, two builds (Gradle and npm). CI gets a second job when the frontend arrives.
-- Deployment options: serve the built files from Spring Boot (simplest), or host them separately. That will be
-  decided in M6.
+- The board component only displays and reports moves. All rule checking stays on the server.
+- The repo has two builds (Gradle and npm), so CI gets a frontend job.
+- We can split the frontend into its own repo later if it becomes necessary.
