@@ -22,6 +22,9 @@ public record Position(
         int halfmoveClock,
         int fullmoveNumber) {
 
+    // Parsed once. Safe to initialise here: Fen has no static state that needs Position, so there is no cycle.
+    private static final Position STARTING = Fen.parse(Fen.STARTING_POSITION);
+
     public Position {
         Objects.requireNonNull(board, "board must not be null");
         Objects.requireNonNull(sideToMove, "sideToMove must not be null");
@@ -44,9 +47,10 @@ public record Position(
     }
 
     /**
-     * Returns the position at the start of a game.
+     * Returns the position at the start of a game. Always the same instance, which is safe because a position is
+     * immutable.
      */
     public static Position starting() {
-        return Fen.parse(Fen.STARTING_POSITION);
+        return STARTING;
     }
 }
