@@ -1,7 +1,10 @@
 package org.srt.chess.engine;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * One of the 64 squares of the board.
@@ -10,6 +13,10 @@ import java.util.Optional;
  * (H, 7).
  */
 public record Square(File file, int rank) {
+
+    private static final List<Square> ALL = IntStream.range(0, 8).boxed()
+            .flatMap(rank -> Arrays.stream(File.values()).map(file -> new Square(file, rank)))
+            .toList();
 
     public Square {
         Objects.requireNonNull(file, "file must not be null");
@@ -34,6 +41,13 @@ public record Square(File file, int rank) {
             throw invalidName(name);
         }
         return new Square(File.fromLetter(fileChar), rankChar - '1');
+    }
+
+    /**
+     * Returns all 64 squares as an unmodifiable list, rank by rank: a1, b1, ..., h1, a2, ..., h8.
+     */
+    public static List<Square> all() {
+        return ALL;
     }
 
     /**
