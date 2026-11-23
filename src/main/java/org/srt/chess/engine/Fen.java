@@ -85,7 +85,7 @@ public final class Fen {
                     file += c - '0';
                 } else {
                     if (file < 8) {
-                        board = board.with(new Square(File.values()[file], rank), Piece.fromLetter(c));
+                        board = board.with(new Square(File.fromIndex(file), rank), Piece.fromLetter(c));
                     }
                     file++;
                 }

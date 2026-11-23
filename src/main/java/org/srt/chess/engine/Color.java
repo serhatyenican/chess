@@ -9,6 +9,8 @@ public enum Color {
     WHITE('w'),
     BLACK('b');
 
+    private static final Color[] VALUES = values();
+
     private final char letter;
 
     Color(char letter) {
@@ -28,7 +30,7 @@ public enum Color {
      * @throws IllegalArgumentException for any other character
      */
     public static Color fromLetter(char letter) {
-        return Arrays.stream(values())
+        return Arrays.stream(VALUES)
                 .filter(color -> color.letter == letter)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(

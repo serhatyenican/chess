@@ -27,6 +27,12 @@ class FileTests {
                 .withMessage("unknown file letter '" + letter + "', expected one of a-h");
     }
 
+    @ParameterizedTest
+    @EnumSource(File.class)
+    void fromIndexIsTheInverseOfOrdinal(File file) {
+        assertThat(File.fromIndex(file.ordinal())).isEqualTo(file);
+    }
+
     @Test
     void constantsAreDeclaredFromAToH() {
         String letters = Arrays.stream(File.values())

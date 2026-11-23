@@ -22,7 +22,7 @@ public record Position(
         int halfmoveClock,
         int fullmoveNumber) {
 
-    // Parsed once. Safe to initialise here: Fen has no static state that needs Position, so there is no cycle.
+    // Parsed once. Safe to initialize here: Fen has no static state that needs Position, so there is no cycle.
     private static final Position STARTING = Fen.parse(Fen.STARTING_POSITION);
 
     public Position {

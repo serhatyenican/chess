@@ -14,6 +14,8 @@ public enum PieceType {
     KNIGHT('n'),
     PAWN('p');
 
+    private static final PieceType[] VALUES = values();
+
     private final char letter;
 
     PieceType(char letter) {
@@ -34,7 +36,7 @@ public enum PieceType {
      * possibly uppercase letter itself.
      */
     public static Optional<PieceType> fromLetter(char letter) {
-        return Arrays.stream(values())
+        return Arrays.stream(VALUES)
                 .filter(type -> type.letter == letter)
                 .findFirst();
     }
