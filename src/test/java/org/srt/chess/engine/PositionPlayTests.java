@@ -1,6 +1,8 @@
 package org.srt.chess.engine;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -50,6 +52,34 @@ class PositionPlayTests {
                 .isEqualTo("rnbqkbnr/ppp1pppp/8/3p4/8/5N2/PPPPPPPP/RNBQKB1R w KQkq d6 0 2");
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "w, e1e2, kq",    // king move: both white rights
+            "w, h1h2, Qkq",   // kingside rook move
+            "w, a1a2, Kkq",   // queenside rook move
+            "b, e8e7, KQ",
+            "b, h8h7, KQq",
+            "b, a8a7, KQk",
+    })
+    void kingAndRookMovesLoseCastlingRights(String sideToMove, String move, String expectedRights) {
+        String fen = "r3k2r/8/8/8/8/8/8/R3K2R " + sideToMove + " KQkq - 0 1";
+
+        assertThat(castlingRights(play(fen, move))).isEqualTo(expectedRights);
+    }
+
+    @Test
+    void capturingARookOnItsCornerLosesTheOpponentsCastlingRight() {
+        // the bishop captures the rook on a8
+        assertThat(castlingRights(play("r3k2r/8/8/8/8/8/6B1/R3K2R w KQkq - 0 1", "g2a8"))).isEqualTo("KQk");
+        // rook takes rook: white loses kingside by moving, black by losing the rook
+        assertThat(castlingRights(play("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", "h1h8"))).isEqualTo("Qq");
+    }
+
+    @Test
+    void otherMovesKeepTheCastlingRights() {
+        assertThat(castlingRights(play("r3k2r/8/8/8/8/8/6B1/R3K2R w KQkq - 0 1", "g2f3"))).isEqualTo("KQkq");
+    }
+
     @Test
     void leavesTheOriginalPositionUnchanged() {
         Position start = Position.starting();
@@ -80,6 +110,11 @@ class PositionPlayTests {
             position = position.play(move(uci));
         }
         return Fen.toFen(position);
+    }
+
+    /** Returns the castling field of the FEN, e.g. {@code "KQkq"}. */
+    private static String castlingRights(String fen) {
+        return fen.split(" ")[2];
     }
 
     private static Move move(String uci) {
