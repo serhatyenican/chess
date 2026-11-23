@@ -59,7 +59,7 @@ public final class Board {
 
     private static int index(Square square) {
         Objects.requireNonNull(square, "square must not be null");
-        return index(square.file(), square.rank());
+        return index(square.file().ordinal(), square.rank());
     }
 
     private static int index(int file, int rank) {

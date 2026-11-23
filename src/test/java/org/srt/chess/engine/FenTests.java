@@ -106,12 +106,12 @@ class FenTests {
                 PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN,
                 PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK};
         Board board = Board.empty();
-        for (int file = 0; file < 8; file++) {
+        for (File file : File.values()) {
             board = board
-                    .with(new Square(file, 0), new Piece(Color.WHITE, backRank[file]))
+                    .with(new Square(file, 0), new Piece(Color.WHITE, backRank[file.ordinal()]))
                     .with(new Square(file, 1), new Piece(Color.WHITE, PieceType.PAWN))
                     .with(new Square(file, 6), new Piece(Color.BLACK, PieceType.PAWN))
-                    .with(new Square(file, 7), new Piece(Color.BLACK, backRank[file]));
+                    .with(new Square(file, 7), new Piece(Color.BLACK, backRank[file.ordinal()]));
         }
         return board;
     }
