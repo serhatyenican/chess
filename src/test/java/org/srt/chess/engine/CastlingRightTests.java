@@ -9,19 +9,22 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class CastlingRightTests {
 
     @ParameterizedTest
     @EnumSource(CastlingRight.class)
     void fromLetterFindsEachRightByItsLetter(CastlingRight right) {
-        assertThat(CastlingRight.fromLetter(right.letter())).contains(right);
+        assertThat(CastlingRight.fromLetter(right.letter())).isEqualTo(right);
     }
 
     @ParameterizedTest
-    @ValueSource(chars = {'-', 'x', 'B', '1', 'K'})
-    void fromLetterIsEmptyForOtherCharacters(char letter) {
-        assertThat(CastlingRight.fromLetter(letter)).isEmpty();
+    @ValueSource(chars = {'-', 'x', 'B', '1'})
+    void fromLetterRejectsOtherCharacters(char letter) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> CastlingRight.fromLetter(letter))
+                .withMessage("unknown castling right letter '" + letter + "', expected one of KQkq");
     }
 
     @Test

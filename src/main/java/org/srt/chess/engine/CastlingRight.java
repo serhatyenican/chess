@@ -1,6 +1,6 @@
 package org.srt.chess.engine;
 
-import java.util.Optional;
+import java.util.Arrays;
 
 /**
  * One of the four castling rights. A right only says castling is still allowed later (king and rook haven't moved);
@@ -29,14 +29,15 @@ public enum CastlingRight {
     }
 
     /**
-     * Returns the right for its FEN letter, or an empty Optional for any other character.
+     * Returns the right for its FEN letter.
+     *
+     * @throws IllegalArgumentException for any other character
      */
-    public static Optional<CastlingRight> fromLetter(char letter) {
-        for (CastlingRight right : values()) {
-            if (right.letter == letter) {
-                return Optional.of(right);
-            }
-        }
-        return Optional.empty();
+    public static CastlingRight fromLetter(char letter) {
+        return Arrays.stream(values())
+                .filter(right -> right.letter == letter)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "unknown castling right letter '" + letter + "', expected one of KQkq"));
     }
 }

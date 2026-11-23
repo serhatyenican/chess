@@ -42,4 +42,11 @@ public record Position(
             throw new IllegalArgumentException("fullmoveNumber must be at least 1, was " + fullmoveNumber);
         }
     }
+
+    /**
+     * Returns the position at the start of a game.
+     */
+    public static Position starting() {
+        return Fen.parse(Fen.STARTING_POSITION);
+    }
 }

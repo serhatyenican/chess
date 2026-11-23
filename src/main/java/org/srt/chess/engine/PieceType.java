@@ -1,5 +1,6 @@
 package org.srt.chess.engine;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -28,14 +29,13 @@ public enum PieceType {
     }
 
     /**
-     * Returns the type for its lowercase letter, or an empty Optional for any other character.
+     * Returns the type for its lowercase letter, or an empty Optional for any other character. Unlike the other
+     * {@code fromLetter} methods it doesn't throw: its caller {@link Piece#fromLetter} reports the original,
+     * possibly uppercase letter itself.
      */
     public static Optional<PieceType> fromLetter(char letter) {
-        for (PieceType type : values()) {
-            if (type.letter == letter) {
-                return Optional.of(type);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(values())
+                .filter(type -> type.letter == letter)
+                .findFirst();
     }
 }
