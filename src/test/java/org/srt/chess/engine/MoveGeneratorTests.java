@@ -138,6 +138,36 @@ class MoveGeneratorTests {
     }
 
     @Test
+    void queenInTheCenterSlidesToTwentySevenSquares() {
+        assertThat(queenMoves("8/8/8/8/3Q4/8/8/8 w - - 0 1", "d4"))
+                .hasSize(27)
+                .containsAll(rookMoves("8/8/8/8/3R4/8/8/8 w - - 0 1", "d4"))
+                .containsAll(bishopMoves("8/8/8/8/3B4/8/8/8 w - - 0 1", "d4"));
+    }
+
+    @Test
+    void queenInTheStartingPositionIsBlockedByItsOwnPieces() {
+        assertThat(queenMoves(Fen.STARTING_POSITION, "d1")).isEmpty();
+    }
+
+    @Test
+    void queenStopsBeforeOwnPiecesAndCapturesOnlyTheFirstEnemyPieceStraightAndDiagonally() {
+        // straight: white pawn on d6 blocks; black pawn on g4 can be captured, the black knight behind it on h4 not
+        // diagonal: white pawn on b2 blocks; black pawn on f6 can be captured, the black knight behind it on g7 not
+        assertThat(queenMoves("8/6n1/3P1p2/8/3Q2pn/8/1P6/8 w - - 0 1", "d4"))
+                .containsExactlyInAnyOrder(
+                        "d4d5", "d4e4", "d4f4", "d4g4", "d4d3", "d4d2", "d4d1", "d4c4", "d4b4", "d4a4",
+                        "d4e5", "d4f6", "d4e3", "d4f2", "d4g1", "d4c3", "d4c5", "d4b6", "d4a7");
+    }
+
+    @Test
+    void blackQueenIsBlockedByBlackPiecesAndCapturesWhitePieces() {
+        // black pawn on h7 blocks, white rook on e8 and white pawn on g7 can be captured
+        assertThat(queenMoves("4R2q/6Pp/8/8/8/8/8/8 b - - 0 1", "h8"))
+                .containsExactlyInAnyOrder("h8g8", "h8f8", "h8e8", "h8g7");
+    }
+
+    @Test
     void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
         assertThat(generate(Fen.STARTING_POSITION))
                 .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
@@ -174,6 +204,16 @@ class MoveGeneratorTests {
                         "e1d1", "e1d2", "e1e2", "e1f2", "e1f1");
     }
 
+    @Test
+    void generateIncludesQueenMoves() {
+        // the queen on d1 slides up the d-file, along rank 1 and both diagonals; it shares d2, e2 with the king
+        assertThat(generate("4k3/8/8/8/8/8/8/3QK3 w - - 0 1"))
+                .containsExactlyInAnyOrder(
+                        "d1d2", "d1d3", "d1d4", "d1d5", "d1d6", "d1d7", "d1d8", "d1c1", "d1b1", "d1a1",
+                        "d1c2", "d1b3", "d1a4", "d1e2", "d1f3", "d1g4", "d1h5",
+                        "e1d2", "e1e2", "e1f2", "e1f1");
+    }
+
     /** Returns all moves of the side to move in UCI form, e.g. {@code "b1c3"}. */
     private static List<String> generate(String fen) {
         return MoveGenerator.generate(Fen.parse(fen)).stream()
@@ -184,6 +224,13 @@ class MoveGeneratorTests {
     /** Returns the knight's moves from {@code from} in UCI form, e.g. {@code "a1b3"}. */
     private static List<String> knightMoves(String fen, String from) {
         return MoveGenerator.knightMoves(Fen.parse(fen), Square.of(from)).stream()
+                .map(Move::toString)
+                .toList();
+    }
+
+    /** Returns the queen's moves from {@code from} in UCI form, e.g. {@code "d1h5"}. */
+    private static List<String> queenMoves(String fen, String from) {
+        return MoveGenerator.queenMoves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
