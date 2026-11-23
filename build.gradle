@@ -31,6 +31,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     testImplementation 'org.testcontainers:testcontainers-postgresql'
+    // Not in Spring Boot's dependency management, so the version is set here (ADR 0009).
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
