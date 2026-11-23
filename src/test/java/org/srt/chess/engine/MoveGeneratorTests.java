@@ -110,6 +110,34 @@ class MoveGeneratorTests {
     }
 
     @Test
+    void bishopInTheCenterSlidesToThirteenSquares() {
+        assertThat(bishopMoves("8/8/8/8/3B4/8/8/8 w - - 0 1", "d4"))
+                .containsExactlyInAnyOrder(
+                        "d4e5", "d4f6", "d4g7", "d4h8", "d4e3", "d4f2", "d4g1",
+                        "d4c3", "d4b2", "d4a1", "d4c5", "d4b6", "d4a7");
+    }
+
+    @Test
+    void bishopInTheStartingPositionIsBlockedByItsOwnPieces() {
+        assertThat(bishopMoves(Fen.STARTING_POSITION, "c1")).isEmpty();
+    }
+
+    @Test
+    void bishopStopsBeforeOwnPiecesAndCapturesOnlyTheFirstEnemyPiece() {
+        // white pawn on f6 blocks; black pawn on b2 can be captured, the black knight behind it on a1 not
+        assertThat(bishopMoves("8/8/5P2/8/3B4/8/1p6/n7 w - - 0 1", "d4"))
+                .containsExactlyInAnyOrder(
+                        "d4e5", "d4e3", "d4f2", "d4g1", "d4c3", "d4b2", "d4c5", "d4b6", "d4a7");
+    }
+
+    @Test
+    void blackBishopIsBlockedByBlackPiecesAndCapturesWhitePieces() {
+        // black pawn on d7 blocks, white pawn on b7 can be captured
+        assertThat(bishopMoves("2b5/1P1p4/8/8/8/8/8/8 b - - 0 1", "c8"))
+                .containsExactly("c8b7");
+    }
+
+    @Test
     void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
         assertThat(generate(Fen.STARTING_POSITION))
                 .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
@@ -137,6 +165,15 @@ class MoveGeneratorTests {
                         "e1d1", "e1d2", "e1e2", "e1f2", "e1f1");
     }
 
+    @Test
+    void generateIncludesBishopMoves() {
+        // the bishop on c1 slides along both diagonals; it shares d2 with the king
+        assertThat(generate("4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"))
+                .containsExactlyInAnyOrder(
+                        "c1d2", "c1e3", "c1f4", "c1g5", "c1h6", "c1b2", "c1a3",
+                        "e1d1", "e1d2", "e1e2", "e1f2", "e1f1");
+    }
+
     /** Returns all moves of the side to move in UCI form, e.g. {@code "b1c3"}. */
     private static List<String> generate(String fen) {
         return MoveGenerator.generate(Fen.parse(fen)).stream()
@@ -154,6 +191,13 @@ class MoveGeneratorTests {
     /** Returns the rook's moves from {@code from} in UCI form, e.g. {@code "a1a8"}. */
     private static List<String> rookMoves(String fen, String from) {
         return MoveGenerator.rookMoves(Fen.parse(fen), Square.of(from)).stream()
+                .map(Move::toString)
+                .toList();
+    }
+
+    /** Returns the bishop's moves from {@code from} in UCI form, e.g. {@code "c1h6"}. */
+    private static List<String> bishopMoves(String fen, String from) {
+        return MoveGenerator.bishopMoves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }

@@ -21,12 +21,15 @@ public final class MoveGenerator {
     private static final List<Offset> ROOK_DIRECTIONS = List.of(
             new Offset(0, 1), new Offset(1, 0), new Offset(0, -1), new Offset(-1, 0));
 
+    private static final List<Offset> BISHOP_DIRECTIONS = List.of(
+            new Offset(1, 1), new Offset(1, -1), new Offset(-1, -1), new Offset(-1, 1));
+
     private MoveGenerator() {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Only king, rook and knight moves are generated so far,
-     * without castling.
+     * Returns the pseudo-legal moves of the side to move. Only king, rook, bishop and knight moves are generated
+     * so far, without castling.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -41,8 +44,9 @@ public final class MoveGenerator {
         return switch (type) {
             case KING -> kingMoves(position, from);
             case ROOK -> rookMoves(position, from);
+            case BISHOP -> bishopMoves(position, from);
             case KNIGHT -> knightMoves(position, from);
-            case QUEEN, BISHOP, PAWN -> List.of();
+            case QUEEN, PAWN -> List.of();
         };
     }
 
@@ -60,6 +64,14 @@ public final class MoveGenerator {
      */
     static List<Move> rookMoves(Position position, Square from) {
         return slidingMoves(position, from, ROOK_DIRECTIONS);
+    }
+
+    /**
+     * Returns the moves of the bishop on {@code from}, which belongs to the side to move: along its diagonals up to
+     * the edge of the board or the first piece, which it captures if it is an enemy piece.
+     */
+    static List<Move> bishopMoves(Position position, Square from) {
+        return slidingMoves(position, from, BISHOP_DIRECTIONS);
     }
 
     /**
