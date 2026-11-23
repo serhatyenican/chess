@@ -41,7 +41,13 @@ accounts and friends, and mobile.
 - Small, focused changes with tests.
 - Ask before big design decisions; propose options with trade-offs.
 - One GitHub issue per task. Branch name `<issue-number>-short-name`, PR description says `Closes #<n>`.
+- Commit messages are one short sentence; explanations go in the PR description.
 - Feature branches and pull requests into `main`, reviewed before merging. CI must be green.
+- Prefer the Java Stream API over for-each loops on collections and arrays (filter, map, find, collect).
+  Index-based `for` loops (e.g. over ranks and files) are fine, and so is a for-each loop that carries state
+  between iterations.
+- Validate untrusted input where it enters the system (the REST API from M3). Inside the engine, only check what
+  catches our own mistakes; no hardening against exotic input.
 - Tests that need the database use Testcontainers (`@Import(TestcontainersConfiguration.class)`); engine tests are plain JUnit.
 - Schema changes are new Flyway migrations `V<n>__description.sql` in `src/main/resources/db/migration`; never edit a merged one.
 - Never commit secrets. Never put passwords in `application.yaml` or `docker-compose.yml`.
