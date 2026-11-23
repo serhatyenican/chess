@@ -50,6 +50,31 @@ class MoveGeneratorTests {
                 .containsExactly("a8b6");
     }
 
+    @Test
+    void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
+        assertThat(generate(Fen.STARTING_POSITION))
+                .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
+    }
+
+    @Test
+    void generateOnlyMovesThePiecesOfTheSideToMove() {
+        // after 1. e4
+        assertThat(generate("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"))
+                .containsExactlyInAnyOrder("b8a6", "b8c6", "g8f6", "g8h6");
+    }
+
+    @Test
+    void generateFindsNothingWithoutKnights() {
+        assertThat(generate("4k3/8/8/8/8/8/8/4K3 w - - 0 1")).isEmpty();
+    }
+
+    /** Returns all moves of the side to move in UCI form, e.g. {@code "b1c3"}. */
+    private static List<String> generate(String fen) {
+        return MoveGenerator.generate(Fen.parse(fen)).stream()
+                .map(Move::toString)
+                .toList();
+    }
+
     /** Returns the knight's moves from {@code from} in UCI form, e.g. {@code "a1b3"}. */
     private static List<String> knightMoves(String fen, String from) {
         return MoveGenerator.knightMoves(Fen.parse(fen), Square.of(from)).stream()
