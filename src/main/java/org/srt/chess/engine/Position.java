@@ -53,4 +53,22 @@ public record Position(
     public static Position starting() {
         return STARTING;
     }
+
+    /**
+     * Returns the position after playing the move, leaving this position unchanged. The move is not validated: it is
+     * expected to come from the move generator.
+     *
+     * @throws IllegalArgumentException if there is no piece on the move's start square
+     */
+    public Position play(Move move) {
+        Objects.requireNonNull(move, "move must not be null");
+        Piece piece = board.pieceAt(move.from())
+                .orElseThrow(() -> new IllegalArgumentException("no piece on " + move.from() + " to play " + move));
+        boolean capture = board.pieceAt(move.to()).isPresent();
+        Board nextBoard = board.without(move.from()).with(move.to(), piece);
+        int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
+        int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
+        return new Position(nextBoard, sideToMove.opposite(), castlingRights, null, nextHalfmoveClock,
+                nextFullmoveNumber);
+    }
 }
