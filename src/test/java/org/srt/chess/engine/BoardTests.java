@@ -80,6 +80,9 @@ class BoardTests {
                 .isThrownBy(() -> Board.empty().with(null, WHITE_KING))
                 .withMessage("square must not be null");
         assertThatNullPointerException()
+                .isThrownBy(() -> Board.empty().without(null))
+                .withMessage("square must not be null");
+        assertThatNullPointerException()
                 .isThrownBy(() -> Board.empty().pieceAt(null))
                 .withMessage("square must not be null");
     }

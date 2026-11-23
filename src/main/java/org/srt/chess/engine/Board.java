@@ -59,7 +59,11 @@ public final class Board {
 
     private static int index(Square square) {
         Objects.requireNonNull(square, "square must not be null");
-        return square.rank() * 8 + square.file();
+        return index(square.file(), square.rank());
+    }
+
+    private static int index(int file, int rank) {
+        return rank * 8 + file;
     }
 
     @Override
@@ -86,7 +90,7 @@ public final class Board {
         StringBuilder diagram = new StringBuilder();
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < 8; file++) {
-                Piece piece = squares[rank * 8 + file];
+                Piece piece = squares[index(file, rank)];
                 diagram.append(piece == null ? '.' : letter(piece));
                 diagram.append(file < 7 ? " " : "\n");
             }
