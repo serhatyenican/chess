@@ -72,4 +72,31 @@ class SquareTests {
     void thereAreSixtyFourSquareNames() {
         assertThat(allSquareNames().distinct()).hasSize(64);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "d4,  1,  2, e6",   // knight jump up and right
+            "d4, -2, -1, b3",   // knight jump down and left
+            "e2,  0,  1, e3",   // one rank up
+            "e7,  0, -1, e6",   // one rank down
+            "a1,  7,  7, h8",   // corner to corner
+            "h1, -7,  7, a8",
+            "d4,  0,  0, d4",   // no change
+    })
+    void offsetReturnsTheTargetSquare(String from, int fileDelta, int rankDelta, String expected) {
+        assertThat(Square.of(from).offset(fileDelta, rankDelta)).contains(Square.of(expected));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "a1, -1,  0",   // left of the a-file
+            "h1,  1,  0",   // right of the h-file
+            "a1,  0, -1",   // below rank 1
+            "a8,  0,  1",   // above rank 8
+            "b1, -2,  1",   // knight jump off the left edge
+            "g8,  1,  2",   // knight jump off the top
+    })
+    void offsetIsEmptyOffTheBoard(String from, int fileDelta, int rankDelta) {
+        assertThat(Square.of(from).offset(fileDelta, rankDelta)).isEmpty();
+    }
 }

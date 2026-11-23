@@ -1,6 +1,7 @@
 package org.srt.chess.engine;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * One of the 64 squares of the board.
@@ -33,6 +34,20 @@ public record Square(File file, int rank) {
             throw invalidName(name);
         }
         return new Square(File.fromLetter(fileChar), rankChar - '1');
+    }
+
+    /**
+     * Returns the square the given number of files and ranks away, or an empty Optional if that is off the board.
+     * Positive {@code fileDelta} moves towards the h-file, positive {@code rankDelta} towards rank 8. For example,
+     * {@code d4.offset(1, 2)} is e6.
+     */
+    public Optional<Square> offset(int fileDelta, int rankDelta) {
+        int targetFile = file.ordinal() + fileDelta;
+        int targetRank = rank + rankDelta;
+        if (targetFile < 0 || targetFile > 7 || targetRank < 0 || targetRank > 7) {
+            return Optional.empty();
+        }
+        return Optional.of(new Square(File.fromIndex(targetFile), targetRank));
     }
 
     private static IllegalArgumentException invalidName(String name) {
