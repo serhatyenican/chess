@@ -34,8 +34,10 @@ class PieceTests {
 
     @ParameterizedTest
     @CsvSource({
-            "K, WHITE, KING", "Q, WHITE, QUEEN", "R, WHITE, ROOK", "B, WHITE, BISHOP", "N, WHITE, KNIGHT", "P, WHITE, PAWN",
-            "k, BLACK, KING", "q, BLACK, QUEEN", "r, BLACK, ROOK", "b, BLACK, BISHOP", "n, BLACK, KNIGHT", "p, BLACK, PAWN",
+            "K, WHITE, KING", "Q, WHITE, QUEEN", "R, WHITE, ROOK",
+            "B, WHITE, BISHOP", "N, WHITE, KNIGHT", "P, WHITE, PAWN",
+            "k, BLACK, KING", "q, BLACK, QUEEN", "r, BLACK, ROOK",
+            "b, BLACK, BISHOP", "n, BLACK, KNIGHT", "p, BLACK, PAWN",
     })
     void lettersMapToPieces(char letter, Color color, PieceType type) {
         Piece piece = new Piece(color, type);
