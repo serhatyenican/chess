@@ -1,6 +1,8 @@
 package org.srt.chess.engine;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Generates pseudo-legal moves: moves that follow how each piece moves, without checking whether they leave the
@@ -15,6 +17,9 @@ public final class MoveGenerator {
     private static final List<Offset> KING_STEPS = List.of(
             new Offset(0, 1), new Offset(1, 1), new Offset(1, 0), new Offset(1, -1),
             new Offset(0, -1), new Offset(-1, -1), new Offset(-1, 0), new Offset(-1, 1));
+
+    private static final List<Offset> ROOK_DIRECTIONS = List.of(
+            new Offset(0, 1), new Offset(1, 0), new Offset(0, -1), new Offset(-1, 0));
 
     private MoveGenerator() {
     }
@@ -49,6 +54,14 @@ public final class MoveGenerator {
     }
 
     /**
+     * Returns the moves of the rook on {@code from}, which belongs to the side to move: along its rank and file up to
+     * the edge of the board or the first piece, which it captures if it is an enemy piece.
+     */
+    static List<Move> rookMoves(Position position, Square from) {
+        return slidingMoves(position, from, ROOK_DIRECTIONS);
+    }
+
+    /**
      * Returns the moves of the knight on {@code from}, which belongs to the side to move: up to eight jumps, each to
      * an empty square or a capture.
      */
@@ -61,12 +74,49 @@ public final class MoveGenerator {
      * a piece of the side to move.
      */
     private static List<Move> stepMoves(Position position, Square from, List<Offset> offsets) {
-        Color mover = position.sideToMove();
         return offsets.stream()
                 .flatMap(offset -> from.offset(offset.fileDelta(), offset.rankDelta()).stream())
-                .filter(to -> position.board().pieceAt(to).map(Piece::color).filter(mover::equals).isEmpty())
+                .filter(to -> position.board().pieceAt(to).isEmpty() || isEnemy(position, to))
                 .map(to -> new Move(from, to))
                 .toList();
+    }
+
+    /**
+     * Returns the moves from {@code from} that repeat each direction up to the edge of the board or the first piece,
+     * which is included as a capture if it belongs to the opponent.
+     */
+    private static List<Move> slidingMoves(Position position, Square from, List<Offset> directions) {
+        return directions.stream()
+                .flatMap(direction -> slide(position, from, direction).stream())
+                .toList();
+    }
+
+    /**
+     * Returns the moves from {@code from} in one direction: every empty square up to the first piece, plus that
+     * piece if it is an enemy piece.
+     */
+    private static List<Move> slide(Position position, Square from, Offset direction) {
+        List<Move> moves = new ArrayList<>();
+        Optional<Square> next = from.offset(direction.fileDelta(), direction.rankDelta());
+        while (next.isPresent()) {
+            Square to = next.get();
+            if (position.board().pieceAt(to).isPresent()) {
+                if (isEnemy(position, to)) {
+                    moves.add(new Move(from, to));    // capture, then stop
+                }
+                break;                                // own piece: stop before it
+            }
+            moves.add(new Move(from, to));            // empty square: keep going
+            next = to.offset(direction.fileDelta(), direction.rankDelta());
+        }
+        return moves;
+    }
+
+    private static boolean isEnemy(Position position, Square square) {
+        return position.board().pieceAt(square)
+                .map(Piece::color)
+                .filter(position.sideToMove().opposite()::equals)
+                .isPresent();
     }
 
     private record Offset(int fileDelta, int rankDelta) {
