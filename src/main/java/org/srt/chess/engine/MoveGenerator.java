@@ -12,11 +12,16 @@ public final class MoveGenerator {
             new Offset(1, 2), new Offset(2, 1), new Offset(2, -1), new Offset(1, -2),
             new Offset(-1, -2), new Offset(-2, -1), new Offset(-2, 1), new Offset(-1, 2));
 
+    private static final List<Offset> KING_STEPS = List.of(
+            new Offset(0, 1), new Offset(1, 1), new Offset(1, 0), new Offset(1, -1),
+            new Offset(0, -1), new Offset(-1, -1), new Offset(-1, 0), new Offset(-1, 1));
+
     private MoveGenerator() {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Only knight moves are generated so far.
+     * Returns the pseudo-legal moves of the side to move. Only knight and king moves are generated so far, without
+     * castling.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -29,9 +34,18 @@ public final class MoveGenerator {
 
     private static List<Move> movesOf(Position position, Square from, PieceType type) {
         return switch (type) {
+            case KING -> kingMoves(position, from);
             case KNIGHT -> knightMoves(position, from);
-            case KING, QUEEN, ROOK, BISHOP, PAWN -> List.of();
+            case QUEEN, ROOK, BISHOP, PAWN -> List.of();
         };
+    }
+
+    /**
+     * Returns the moves of the king on {@code from}, which belongs to the side to move: one step in each of the eight
+     * directions, each to an empty square or a capture. Castling is not included.
+     */
+    static List<Move> kingMoves(Position position, Square from) {
+        return stepMoves(position, from, KING_STEPS);
     }
 
     /**
