@@ -19,12 +19,11 @@ public record Piece(Color color, PieceType type) {
      * @throws IllegalArgumentException for any other character
      */
     public static Piece fromLetter(char letter) {
-        boolean isLowerCase = Character.isLowerCase(letter);
-        PieceType type = PieceType.fromLetter(Character.toLowerCase(letter))
-                // exact ASCII only: rejects the Kelvin sign
-                .filter(pieceType -> isLowerCase || letter == Character.toUpperCase(pieceType.letter()))
-                .orElseThrow(() -> new IllegalArgumentException("unknown piece letter '" + letter + "'"));
-        return new Piece(isLowerCase ? Color.BLACK : Color.WHITE, type);
+        Color color = Character.isUpperCase(letter) ? Color.WHITE : Color.BLACK;
+        return PieceType.fromLetter(Character.toLowerCase(letter))
+                .map(type -> new Piece(color, type))
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "unknown piece letter '" + letter + "', expected one of KQRBNPkqrbnp"));
     }
 
     /**

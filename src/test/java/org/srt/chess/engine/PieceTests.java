@@ -45,10 +45,10 @@ class PieceTests {
     }
 
     @ParameterizedTest
-    @ValueSource(chars = {'x', 'X', '1', '.', ' ', 'K'})
-    void rejectsUnknownLetters(char letter) {
+    @ValueSource(chars = {'x', 'X', '1', '.', ' '})
+    void fromLetterRejectsOtherCharacters(char letter) {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> Piece.fromLetter(letter))
-                .withMessage("unknown piece letter '" + letter + "'");
+                .withMessage("unknown piece letter '" + letter + "', expected one of KQRBNPkqrbnp");
     }
 }
