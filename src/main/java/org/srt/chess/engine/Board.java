@@ -91,22 +91,10 @@ public final class Board {
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < 8; file++) {
                 Piece piece = squares[index(file, rank)];
-                diagram.append(piece == null ? '.' : letter(piece));
+                diagram.append(piece == null ? '.' : piece.letter());
                 diagram.append(file < 7 ? " " : "\n");
             }
         }
         return diagram.toString();
-    }
-
-    private static char letter(Piece piece) {
-        char letter = switch (piece.type()) {
-            case KING -> 'k';
-            case QUEEN -> 'q';
-            case ROOK -> 'r';
-            case BISHOP -> 'b';
-            case KNIGHT -> 'n';
-            case PAWN -> 'p';
-        };
-        return piece.color() == Color.WHITE ? Character.toUpperCase(letter) : letter;
     }
 }
