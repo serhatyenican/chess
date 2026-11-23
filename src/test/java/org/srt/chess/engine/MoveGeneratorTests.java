@@ -168,6 +168,35 @@ class MoveGeneratorTests {
     }
 
     @Test
+    void whitePawnOnItsStartingRankMovesOneOrTwoSquaresUp() {
+        assertThat(pawnMoves(Fen.STARTING_POSITION, "e2")).containsExactlyInAnyOrder("e2e3", "e2e4");
+    }
+
+    @Test
+    void blackPawnOnItsStartingRankMovesOneOrTwoSquaresDown() {
+        // after 1. e4
+        assertThat(pawnMoves("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", "e7"))
+                .containsExactlyInAnyOrder("e7e6", "e7e5");
+    }
+
+    @Test
+    void pawnBlockedDirectlyInFrontCannotMoveForward() {
+        // pawns never capture straight ahead, so the black pawn on e3 blocks
+        assertThat(pawnMoves("8/8/8/8/8/4p3/4P3/8 w - - 0 1", "e2")).isEmpty();
+    }
+
+    @Test
+    void pawnCannotDoubleStepWhenTheSecondSquareIsBlocked() {
+        assertThat(pawnMoves("8/8/8/8/4n3/8/4P3/8 w - - 0 1", "e2")).containsExactly("e2e3");
+    }
+
+    @Test
+    void pawnOffItsStartingRankOnlyStepsOnce() {
+        assertThat(pawnMoves("8/8/8/8/8/4P3/8/8 w - - 0 1", "e3")).containsExactly("e3e4");
+        assertThat(pawnMoves("8/8/4p3/8/8/8/8/8 b - - 0 1", "e6")).containsExactly("e6e5");
+    }
+
+    @Test
     void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
         assertThat(generate(Fen.STARTING_POSITION))
                 .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
@@ -224,6 +253,13 @@ class MoveGeneratorTests {
     /** Returns the knight's moves from {@code from} in UCI form, e.g. {@code "a1b3"}. */
     private static List<String> knightMoves(String fen, String from) {
         return MoveGenerator.knightMoves(Fen.parse(fen), Square.of(from)).stream()
+                .map(Move::toString)
+                .toList();
+    }
+
+    /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e2e4"}. */
+    private static List<String> pawnMoves(String fen, String from) {
+        return MoveGenerator.pawnMoves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }

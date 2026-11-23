@@ -3,6 +3,7 @@ package org.srt.chess.engine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -97,13 +98,30 @@ public final class MoveGenerator {
     }
 
     /**
+     * Returns the moves of the pawn on {@code from}, which belongs to the side to move: one step forward onto an empty
+     * square, and two steps from its starting rank if both squares are empty. Captures, en passant and promotion are
+     * not generated yet.
+     */
+    static List<Move> pawnMoves(Position position, Square from) {
+        Color mover = position.sideToMove();
+        int forward = forward(mover);
+        int maxSteps = from.rank() == startRank(mover) ? 2 : 1;
+        return IntStream.rangeClosed(1, maxSteps)
+                .mapToObj(steps -> from.offset(0, forward * steps))
+                .flatMap(Optional::stream)
+                .takeWhile(to -> isEmpty(position, to))
+                .map(to -> new Move(from, to))
+                .toList();
+    }
+
+    /**
      * Returns the moves from {@code from} that apply each offset once, skipping squares off the board or taken by
      * a piece of the side to move.
      */
     private static List<Move> stepMoves(Position position, Square from, List<Offset> offsets) {
         return offsets.stream()
                 .flatMap(offset -> from.offset(offset.fileDelta(), offset.rankDelta()).stream())
-                .filter(to -> position.board().pieceAt(to).isEmpty() || isEnemy(position, to))
+                .filter(to -> isEmpty(position, to) || isEnemy(position, to))
                 .map(to -> new Move(from, to))
                 .toList();
     }
@@ -127,7 +145,7 @@ public final class MoveGenerator {
         Optional<Square> next = from.offset(direction.fileDelta(), direction.rankDelta());
         while (next.isPresent()) {
             Square to = next.get();
-            if (position.board().pieceAt(to).isPresent()) {
+            if (!isEmpty(position, to)) {
                 if (isEnemy(position, to)) {
                     moves.add(new Move(from, to));    // capture, then stop
                 }
@@ -139,11 +157,25 @@ public final class MoveGenerator {
         return moves;
     }
 
+    private static boolean isEmpty(Position position, Square square) {
+        return position.board().pieceAt(square).isEmpty();
+    }
+
     private static boolean isEnemy(Position position, Square square) {
         return position.board().pieceAt(square)
                 .map(Piece::color)
                 .filter(position.sideToMove().opposite()::equals)
                 .isPresent();
+    }
+
+    /** Returns the rank direction pawns of the given color move in: up for white, down for black. */
+    private static int forward(Color color) {
+        return color == Color.WHITE ? 1 : -1;
+    }
+
+    /** Returns the rank pawns of the given color start on: rank 2 for white, rank 7 for black. */
+    private static int startRank(Color color) {
+        return color == Color.WHITE ? 1 : 6;
     }
 
     private record Offset(int fileDelta, int rankDelta) {
