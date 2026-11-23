@@ -1,8 +1,11 @@
 package org.srt.chess.engine;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Everything needed to continue a game: the pieces on the board plus the state FEN records alongside them.
@@ -21,6 +24,16 @@ public record Position(
         Square enPassant,
         int halfmoveClock,
         int fullmoveNumber) {
+
+    // A castling right is lost once a move starts or ends on its king's or rook's starting square: the king or the rook
+    // has moved, or the rook has been captured.
+    private static final Map<Square, Set<CastlingRight>> CASTLING_RIGHTS_LOST_ON = Map.of(
+            Square.of("e1"), Set.of(CastlingRight.WHITE_KINGSIDE, CastlingRight.WHITE_QUEENSIDE),
+            Square.of("h1"), Set.of(CastlingRight.WHITE_KINGSIDE),
+            Square.of("a1"), Set.of(CastlingRight.WHITE_QUEENSIDE),
+            Square.of("e8"), Set.of(CastlingRight.BLACK_KINGSIDE, CastlingRight.BLACK_QUEENSIDE),
+            Square.of("h8"), Set.of(CastlingRight.BLACK_KINGSIDE),
+            Square.of("a8"), Set.of(CastlingRight.BLACK_QUEENSIDE));
 
     // Parsed once. Safe to initialize here: Fen has no static state that needs Position, so there is no cycle.
     private static final Position STARTING = Fen.parse(Fen.STARTING_POSITION);
@@ -68,8 +81,17 @@ public record Position(
         Board nextBoard = board.without(move.from()).with(move.to(), piece);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
         int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
-        return new Position(nextBoard, sideToMove.opposite(), castlingRights, enPassantSquare(piece, move),
+        return new Position(nextBoard, sideToMove.opposite(), castlingRightsAfter(move), enPassantSquare(piece, move),
                 nextHalfmoveClock, nextFullmoveNumber);
+    }
+
+    private Set<CastlingRight> castlingRightsAfter(Move move) {
+        Set<CastlingRight> lost = Stream.of(move.from(), move.to())
+                .flatMap(square -> CASTLING_RIGHTS_LOST_ON.getOrDefault(square, Set.of()).stream())
+                .collect(Collectors.toSet());
+        return castlingRights.stream()
+                .filter(right -> !lost.contains(right))
+                .collect(Collectors.toSet());
     }
 
     /**
