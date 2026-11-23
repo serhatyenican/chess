@@ -34,7 +34,7 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Pawn moves and castling are not generated yet.
+     * Returns the pseudo-legal moves of the side to move. Castling, en passant and promotion are not generated yet.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -52,7 +52,7 @@ public final class MoveGenerator {
             case ROOK -> rookMoves(position, from);
             case BISHOP -> bishopMoves(position, from);
             case KNIGHT -> knightMoves(position, from);
-            case PAWN -> List.of();
+            case PAWN -> pawnMoves(position, from);
         };
     }
 
