@@ -33,6 +33,11 @@ class PositionTests {
     }
 
     @Test
+    void startingPositionIsParsedOnce() {
+        assertThat(Position.starting()).isSameAs(Position.starting());
+    }
+
+    @Test
     void enPassantSquareIsOptional() {
         Position position = new Position(BOARD, Color.WHITE, Set.of(), null, 0, 1);
 
