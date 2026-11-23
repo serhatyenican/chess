@@ -128,6 +128,15 @@ class MoveGeneratorTests {
                 .containsExactlyInAnyOrder("a1b3", "a1c2", "e1d1", "e1d2", "e1e2", "e1f2", "e1f1");
     }
 
+    @Test
+    void generateIncludesRookMoves() {
+        // the rook on a1 slides up the a-file and along rank 1 until the king on e1
+        assertThat(generate("4k3/8/8/8/8/8/8/R3K3 w - - 0 1"))
+                .containsExactlyInAnyOrder(
+                        "a1a2", "a1a3", "a1a4", "a1a5", "a1a6", "a1a7", "a1a8", "a1b1", "a1c1", "a1d1",
+                        "e1d1", "e1d2", "e1e2", "e1f2", "e1f1");
+    }
+
     /** Returns all moves of the side to move in UCI form, e.g. {@code "b1c3"}. */
     private static List<String> generate(String fen) {
         return MoveGenerator.generate(Fen.parse(fen)).stream()

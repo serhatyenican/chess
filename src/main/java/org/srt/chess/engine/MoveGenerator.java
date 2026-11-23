@@ -25,8 +25,8 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Only knight and king moves are generated so far, without
-     * castling.
+     * Returns the pseudo-legal moves of the side to move. Only king, rook and knight moves are generated so far,
+     * without castling.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -40,8 +40,9 @@ public final class MoveGenerator {
     private static List<Move> movesOf(Position position, Square from, PieceType type) {
         return switch (type) {
             case KING -> kingMoves(position, from);
+            case ROOK -> rookMoves(position, from);
             case KNIGHT -> knightMoves(position, from);
-            case QUEEN, ROOK, BISHOP, PAWN -> List.of();
+            case QUEEN, BISHOP, PAWN -> List.of();
         };
     }
 
