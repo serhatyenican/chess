@@ -82,6 +82,34 @@ class MoveGeneratorTests {
     }
 
     @Test
+    void rookInTheCenterSlidesToFourteenSquares() {
+        assertThat(rookMoves("8/8/8/8/3R4/8/8/8 w - - 0 1", "d4"))
+                .containsExactlyInAnyOrder(
+                        "d4d5", "d4d6", "d4d7", "d4d8", "d4d3", "d4d2", "d4d1",
+                        "d4a4", "d4b4", "d4c4", "d4e4", "d4f4", "d4g4", "d4h4");
+    }
+
+    @Test
+    void rookInTheStartingPositionIsBlockedByItsOwnPieces() {
+        assertThat(rookMoves(Fen.STARTING_POSITION, "a1")).isEmpty();
+    }
+
+    @Test
+    void rookStopsBeforeOwnPiecesAndCapturesOnlyTheFirstEnemyPiece() {
+        // white pawn on d6 blocks upwards; black pawn on f4 can be captured, the black knight behind it on g4 not
+        assertThat(rookMoves("8/8/3P4/8/3R1pn1/8/8/8 w - - 0 1", "d4"))
+                .containsExactlyInAnyOrder(
+                        "d4d5", "d4e4", "d4f4", "d4d3", "d4d2", "d4d1", "d4c4", "d4b4", "d4a4");
+    }
+
+    @Test
+    void blackRookIsBlockedByBlackPiecesAndCapturesWhitePieces() {
+        // black pawn on h7 blocks, white knight on c8 can be captured
+        assertThat(rookMoves("2N4r/7p/8/8/8/8/8/8 b - - 0 1", "h8"))
+                .containsExactlyInAnyOrder("h8g8", "h8f8", "h8e8", "h8d8", "h8c8");
+    }
+
+    @Test
     void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
         assertThat(generate(Fen.STARTING_POSITION))
                 .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
@@ -110,6 +138,13 @@ class MoveGeneratorTests {
     /** Returns the knight's moves from {@code from} in UCI form, e.g. {@code "a1b3"}. */
     private static List<String> knightMoves(String fen, String from) {
         return MoveGenerator.knightMoves(Fen.parse(fen), Square.of(from)).stream()
+                .map(Move::toString)
+                .toList();
+    }
+
+    /** Returns the rook's moves from {@code from} in UCI form, e.g. {@code "a1a8"}. */
+    private static List<String> rookMoves(String fen, String from) {
+        return MoveGenerator.rookMoves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
