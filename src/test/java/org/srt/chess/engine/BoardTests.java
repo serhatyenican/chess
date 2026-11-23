@@ -18,7 +18,7 @@ class BoardTests {
     @Test
     void emptyBoardHasNoPieces() {
         IntStream.range(0, 64).forEach(i -> {
-            Square square = new Square(i % 8, i / 8);
+            Square square = new Square(File.values()[i % 8], i / 8);
             assertThat(Board.empty().pieceAt(square)).as("piece at %s", square).isEmpty();
         });
     }

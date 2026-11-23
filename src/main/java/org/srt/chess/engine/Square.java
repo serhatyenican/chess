@@ -5,15 +5,13 @@ import java.util.Objects;
 /**
  * One of the 64 squares of the board.
  * <p>
- * {@code file} is the column, 0-7 for a-h. {@code rank} is the row, 0-7 for 1-8. So a1 is (0, 0), e4 is (4, 3)
- * and h8 is (7, 7).
+ * {@code file} is the column a-h. {@code rank} is the row, 0-7 for 1-8. So a1 is (A, 0), e4 is (E, 3) and h8 is
+ * (H, 7).
  */
-public record Square(int file, int rank) {
+public record Square(File file, int rank) {
 
     public Square {
-        if (file < 0 || file > 7) {
-            throw new IllegalArgumentException("file must be 0-7, was " + file);
-        }
+        Objects.requireNonNull(file, "file must not be null");
         if (rank < 0 || rank > 7) {
             throw new IllegalArgumentException("rank must be 0-7, was " + rank);
         }
@@ -34,7 +32,7 @@ public record Square(int file, int rank) {
         if (fileChar < 'a' || fileChar > 'h' || rankChar < '1' || rankChar > '8') {
             throw invalidName(name);
         }
-        return new Square(fileChar - 'a', rankChar - '1');
+        return new Square(File.fromLetter(fileChar), rankChar - '1');
     }
 
     private static IllegalArgumentException invalidName(String name) {
@@ -47,6 +45,6 @@ public record Square(int file, int rank) {
      */
     @Override
     public String toString() {
-        return "" + (char) ('a' + file) + (char) ('1' + rank);
+        return "" + file.letter() + (char) ('1' + rank);
     }
 }

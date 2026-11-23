@@ -17,13 +17,13 @@ class SquareTests {
 
     @ParameterizedTest
     @CsvSource({
-            "a1, 0, 0",
-            "h8, 7, 7",
-            "e4, 4, 3",
-            "a8, 0, 7",
-            "h1, 7, 0",
+            "a1, A, 0",
+            "h8, H, 7",
+            "e4, E, 3",
+            "a8, A, 7",
+            "h1, H, 0",
     })
-    void parsesAlgebraicNotation(String name, int file, int rank) {
+    void parsesAlgebraicNotation(String name, File file, int rank) {
         assertThat(Square.of(name)).isEqualTo(new Square(file, rank));
     }
 
@@ -43,11 +43,18 @@ class SquareTests {
     }
 
     @ParameterizedTest
-    @CsvSource({"-1, 0", "8, 0", "0, -1", "0, 8"})
-    void rejectsCoordinatesOutsideTheBoard(int file, int rank) {
+    @ValueSource(ints = {-1, 8})
+    void rejectsRankOutsideTheBoard(int rank) {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Square(file, rank))
-                .withMessageContaining("must be 0-7");
+                .isThrownBy(() -> new Square(File.A, rank))
+                .withMessage("rank must be 0-7, was " + rank);
+    }
+
+    @Test
+    void rejectsMissingFile() {
+        assertThatNullPointerException()
+                .isThrownBy(() -> new Square(null, 0))
+                .withMessage("file must not be null");
     }
 
     @ParameterizedTest
