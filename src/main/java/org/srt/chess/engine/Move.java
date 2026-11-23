@@ -40,16 +40,6 @@ public record Move(Square from, Square to, PieceType promotion) {
      */
     @Override
     public String toString() {
-        return "" + from + to + (isPromotion() ? promotionLetter() : "");
-    }
-
-    private char promotionLetter() {
-        return switch (promotion) {
-            case QUEEN -> 'q';
-            case ROOK -> 'r';
-            case BISHOP -> 'b';
-            case KNIGHT -> 'n';
-            case KING, PAWN -> throw new AssertionError("unreachable: the constructor rejects " + promotion);
-        };
+        return "" + from + to + (isPromotion() ? promotion.letter() : "");
     }
 }
