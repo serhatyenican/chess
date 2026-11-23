@@ -2,8 +2,6 @@ package org.srt.chess.engine;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.IntStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
@@ -17,10 +15,8 @@ class BoardTests {
 
     @Test
     void emptyBoardHasNoPieces() {
-        IntStream.range(0, 64).forEach(i -> {
-            Square square = new Square(File.fromIndex(i % 8), i / 8);
-            assertThat(Board.empty().pieceAt(square)).as("piece at %s", square).isEmpty();
-        });
+        Square.all().forEach(square ->
+                assertThat(Board.empty().pieceAt(square)).as("piece at %s", square).isEmpty());
     }
 
     @Test

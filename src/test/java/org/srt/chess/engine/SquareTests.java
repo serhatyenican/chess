@@ -6,12 +6,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SquareTests {
 
@@ -71,6 +73,24 @@ class SquareTests {
     @Test
     void thereAreSixtyFourSquareNames() {
         assertThat(allSquareNames().distinct()).hasSize(64);
+    }
+
+    @Test
+    void allListsTheSixtyFourSquaresRankByRank() {
+        List<Square> all = Square.all();
+
+        assertThat(all).hasSize(64).doesNotHaveDuplicates();
+        assertThat(all.getFirst()).isEqualTo(Square.of("a1"));
+        assertThat(all.get(7)).isEqualTo(Square.of("h1"));
+        assertThat(all.get(8)).isEqualTo(Square.of("a2"));
+        assertThat(all.getLast()).isEqualTo(Square.of("h8"));
+    }
+
+    @Test
+    void allIsBuiltOnceAndCannotBeChanged() {
+        assertThat(Square.all()).isSameAs(Square.all());
+        assertThatThrownBy(() -> Square.all().add(Square.of("e4")))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @ParameterizedTest
