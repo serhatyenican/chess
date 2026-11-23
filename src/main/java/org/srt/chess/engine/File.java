@@ -10,6 +10,8 @@ import java.util.Arrays;
 public enum File {
     A, B, C, D, E, F, G, H;
 
+    private static final File[] VALUES = values();
+
     /**
      * Returns the letter of this file in algebraic notation, e.g. {@code 'e'}: the constant's name in lowercase.
      */
@@ -18,12 +20,19 @@ public enum File {
     }
 
     /**
+     * Returns the file for its index 0-7, the inverse of {@link #ordinal()}: 0 is a, 7 is h.
+     */
+    public static File fromIndex(int index) {
+        return VALUES[index];
+    }
+
+    /**
      * Returns the file for its lowercase letter.
      *
      * @throws IllegalArgumentException for any other character
      */
     public static File fromLetter(char letter) {
-        return Arrays.stream(values())
+        return Arrays.stream(VALUES)
                 .filter(file -> file.letter() == letter)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(

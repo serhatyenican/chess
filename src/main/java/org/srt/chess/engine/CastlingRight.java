@@ -15,6 +15,8 @@ public enum CastlingRight {
     BLACK_KINGSIDE('k'),
     BLACK_QUEENSIDE('q');
 
+    private static final CastlingRight[] VALUES = values();
+
     private final char letter;
 
     CastlingRight(char letter) {
@@ -34,7 +36,7 @@ public enum CastlingRight {
      * @throws IllegalArgumentException for any other character
      */
     public static CastlingRight fromLetter(char letter) {
-        return Arrays.stream(values())
+        return Arrays.stream(VALUES)
                 .filter(right -> right.letter == letter)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
