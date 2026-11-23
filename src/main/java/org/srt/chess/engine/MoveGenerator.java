@@ -3,6 +3,7 @@ package org.srt.chess.engine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Generates pseudo-legal moves: moves that follow how each piece moves, without checking whether they leave the
@@ -24,12 +25,15 @@ public final class MoveGenerator {
     private static final List<Offset> BISHOP_DIRECTIONS = List.of(
             new Offset(1, 1), new Offset(1, -1), new Offset(-1, -1), new Offset(-1, 1));
 
+    // Declared after the rook and bishop directions, which must be initialized first.
+    private static final List<Offset> QUEEN_DIRECTIONS =
+            Stream.concat(ROOK_DIRECTIONS.stream(), BISHOP_DIRECTIONS.stream()).toList();
+
     private MoveGenerator() {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Only king, rook, bishop and knight moves are generated
-     * so far, without castling.
+     * Returns the pseudo-legal moves of the side to move. Pawn moves and castling are not generated yet.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -43,10 +47,11 @@ public final class MoveGenerator {
     private static List<Move> movesOf(Position position, Square from, PieceType type) {
         return switch (type) {
             case KING -> kingMoves(position, from);
+            case QUEEN -> queenMoves(position, from);
             case ROOK -> rookMoves(position, from);
             case BISHOP -> bishopMoves(position, from);
             case KNIGHT -> knightMoves(position, from);
-            case QUEEN, PAWN -> List.of();
+            case PAWN -> List.of();
         };
     }
 
@@ -56,6 +61,15 @@ public final class MoveGenerator {
      */
     static List<Move> kingMoves(Position position, Square from) {
         return stepMoves(position, from, KING_STEPS);
+    }
+
+    /**
+     * Returns the moves of the queen on {@code from}, which belongs to the side to move: like a rook and a bishop
+     * together, along its rank, file and diagonals up to the edge of the board or the first piece, which it captures
+     * if it is an enemy piece.
+     */
+    static List<Move> queenMoves(Position position, Square from) {
+        return slidingMoves(position, from, QUEEN_DIRECTIONS);
     }
 
     /**
