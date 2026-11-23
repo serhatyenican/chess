@@ -39,9 +39,17 @@ public final class MoveGenerator {
      * an empty square or a capture.
      */
     static List<Move> knightMoves(Position position, Square from) {
+        return stepMoves(position, from, KNIGHT_JUMPS);
+    }
+
+    /**
+     * Returns the moves from {@code from} that apply each offset once, skipping squares off the board or taken by
+     * a piece of the side to move.
+     */
+    private static List<Move> stepMoves(Position position, Square from, List<Offset> offsets) {
         Color mover = position.sideToMove();
-        return KNIGHT_JUMPS.stream()
-                .flatMap(jump -> from.offset(jump.fileDelta(), jump.rankDelta()).stream())
+        return offsets.stream()
+                .flatMap(offset -> from.offset(offset.fileDelta(), offset.rankDelta()).stream())
                 .filter(to -> position.board().pieceAt(to).map(Piece::color).filter(mover::equals).isEmpty())
                 .map(to -> new Move(from, to))
                 .toList();
