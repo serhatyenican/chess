@@ -99,17 +99,21 @@ public final class MoveGenerator {
 
     /**
      * Returns the moves of the pawn on {@code from}, which belongs to the side to move: one step forward onto an empty
-     * square, and two steps from its starting rank if both squares are empty. Captures, en passant and promotion are
-     * not generated yet.
+     * square, two steps from its starting rank if both squares are empty, and one step diagonally forward onto an
+     * enemy piece. En passant and promotion are not generated yet.
      */
     static List<Move> pawnMoves(Position position, Square from) {
         Color mover = position.sideToMove();
         int forward = forward(mover);
         int maxSteps = from.rank() == startRank(mover) ? 2 : 1;
-        return IntStream.rangeClosed(1, maxSteps)
+        Stream<Square> pushes = IntStream.rangeClosed(1, maxSteps)
                 .mapToObj(steps -> from.offset(0, forward * steps))
                 .flatMap(Optional::stream)
-                .takeWhile(to -> isEmpty(position, to))
+                .takeWhile(to -> isEmpty(position, to));
+        Stream<Square> captures = Stream.of(-1, 1)
+                .flatMap(fileDelta -> from.offset(fileDelta, forward).stream())
+                .filter(to -> isEnemy(position, to));
+        return Stream.concat(pushes, captures)
                 .map(to -> new Move(from, to))
                 .toList();
     }

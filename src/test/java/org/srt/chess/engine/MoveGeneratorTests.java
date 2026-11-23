@@ -197,6 +197,31 @@ class MoveGeneratorTests {
     }
 
     @Test
+    void pawnCapturesEnemyPiecesDiagonallyForward() {
+        // the black pawn on e5 blocks the step forward
+        assertThat(pawnMoves("8/8/8/3ppp2/4P3/8/8/8 w - - 0 1", "e4")).containsExactlyInAnyOrder("e4d5", "e4f5");
+    }
+
+    @Test
+    void pawnDoesNotMoveDiagonallyOntoEmptySquaresOrOwnPieces() {
+        // white knight on d5, f5 is empty
+        assertThat(pawnMoves("8/8/8/3N4/4P3/8/8/8 w - - 0 1", "e4")).containsExactly("e4e5");
+    }
+
+    @Test
+    void pawnsOnTheEdgeFilesCaptureOnlyTowardsTheBoard() {
+        // h4 is where "up and left" from a4 would wrap to on a board stored as 64 squares in a row
+        assertThat(pawnMoves("8/8/8/1p6/P6p/8/8/8 w - - 0 1", "a4")).containsExactlyInAnyOrder("a4a5", "a4b5");
+        assertThat(pawnMoves("8/8/8/6p1/7P/8/8/8 w - - 0 1", "h4")).containsExactlyInAnyOrder("h4h5", "h4g5");
+    }
+
+    @Test
+    void blackPawnCapturesDiagonallyDown() {
+        // the white pawn on e4 blocks the step forward
+        assertThat(pawnMoves("8/8/8/4p3/3PPP2/8/8/8 b - - 0 1", "e5")).containsExactlyInAnyOrder("e5d4", "e5f4");
+    }
+
+    @Test
     void generateFindsTheKnightMovesOfWhiteInTheStartingPosition() {
         assertThat(generate(Fen.STARTING_POSITION))
                 .containsExactlyInAnyOrder("b1a3", "b1c3", "g1f3", "g1h3");
