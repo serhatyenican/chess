@@ -33,6 +33,24 @@ class PositionPlayTests {
     }
 
     @Test
+    void doubleStepSetsTheEnPassantSquareBehindThePawn() {
+        assertThat(play(Fen.STARTING_POSITION, "e2e4"))
+                .isEqualTo("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+    }
+
+    @Test
+    void nextMoveClearsTheEnPassantSquare() {
+        assertThat(play(Fen.STARTING_POSITION, "e2e4", "g8f6"))
+                .isEqualTo("rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2");
+    }
+
+    @Test
+    void blackDoubleStepSetsTheEnPassantSquareBehindThePawn() {
+        assertThat(play(Fen.STARTING_POSITION, "g1f3", "d7d5"))
+                .isEqualTo("rnbqkbnr/ppp1pppp/8/3p4/8/5N2/PPPPPPPP/RNBQKB1R w KQkq d6 0 2");
+    }
+
+    @Test
     void leavesTheOriginalPositionUnchanged() {
         Position start = Position.starting();
 
