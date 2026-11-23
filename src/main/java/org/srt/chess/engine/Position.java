@@ -68,7 +68,15 @@ public record Position(
         Board nextBoard = board.without(move.from()).with(move.to(), piece);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
         int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
-        return new Position(nextBoard, sideToMove.opposite(), castlingRights, null, nextHalfmoveClock,
-                nextFullmoveNumber);
+        return new Position(nextBoard, sideToMove.opposite(), castlingRights, enPassantSquare(piece, move),
+                nextHalfmoveClock, nextFullmoveNumber);
+    }
+
+    /**
+     * Returns the square a pawn's double step passed over, or {@code null} if the move is not a double step.
+     */
+    private static Square enPassantSquare(Piece piece, Move move) {
+        boolean doubleStep = piece.type() == PieceType.PAWN && Math.abs(move.to().rank() - move.from().rank()) == 2;
+        return doubleStep ? new Square(move.from().file(), (move.from().rank() + move.to().rank()) / 2) : null;
     }
 }
