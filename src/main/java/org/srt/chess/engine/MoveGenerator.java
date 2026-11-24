@@ -3,6 +3,7 @@ package org.srt.chess.engine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -159,6 +160,53 @@ public final class MoveGenerator {
             next = to.offset(direction.fileDelta(), direction.rankDelta());
         }
         return moves;
+    }
+
+    /**
+     * Returns whether a piece of {@code byColor} attacks {@code square}, i.e. could capture a piece standing there.
+     * Looks outward from the square: knight jumps, king steps and sliding lines are symmetric, so an attacker stands
+     * one of those offsets or lines away. Pawns attack in one direction only, so their offsets depend on the color.
+     */
+    static boolean isAttacked(Board board, Square square, Color byColor) {
+        int backward = -forward(byColor);
+        List<Offset> pawnAttackers = List.of(new Offset(-1, backward), new Offset(1, backward));
+        return isAttackedByStep(board, square, KNIGHT_JUMPS, new Piece(byColor, PieceType.KNIGHT))
+                || isAttackedByStep(board, square, KING_STEPS, new Piece(byColor, PieceType.KING))
+                || isAttackedByStep(board, square, pawnAttackers, new Piece(byColor, PieceType.PAWN))
+                || isAttackedBySlide(board, square, ROOK_DIRECTIONS,
+                        Set.of(new Piece(byColor, PieceType.ROOK), new Piece(byColor, PieceType.QUEEN)))
+                || isAttackedBySlide(board, square, BISHOP_DIRECTIONS,
+                        Set.of(new Piece(byColor, PieceType.BISHOP), new Piece(byColor, PieceType.QUEEN)));
+    }
+
+    private static boolean isAttackedByStep(Board board, Square square, List<Offset> offsets, Piece attacker) {
+        return offsets.stream()
+                .flatMap(offset -> square.offset(offset.fileDelta(), offset.rankDelta()).stream())
+                .flatMap(from -> board.pieceAt(from).stream())
+                .anyMatch(attacker::equals);
+    }
+
+    private static boolean isAttackedBySlide(
+            Board board, Square square, List<Offset> directions, Set<Piece> attackers) {
+        return directions.stream()
+                .flatMap(direction -> firstPiece(board, square, direction).stream())
+                .anyMatch(attackers::contains);
+    }
+
+    /**
+     * Returns the first piece seen from {@code square} in one direction, or an empty Optional if the line is empty up
+     * to the edge of the board.
+     */
+    private static Optional<Piece> firstPiece(Board board, Square square, Offset direction) {
+        Optional<Square> next = square.offset(direction.fileDelta(), direction.rankDelta());
+        while (next.isPresent()) {
+            Optional<Piece> piece = board.pieceAt(next.get());
+            if (piece.isPresent()) {
+                return piece;
+            }
+            next = next.get().offset(direction.fileDelta(), direction.rankDelta());
+        }
+        return Optional.empty();
     }
 
     private static boolean isEmpty(Position position, Square square) {
