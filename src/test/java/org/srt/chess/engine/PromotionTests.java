@@ -1,11 +1,46 @@
 package org.srt.chess.engine;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PromotionTests {
+
+    @Test
+    void pawnStepOntoTheLastRankBecomesFourPromotions() {
+        assertThat(pawnMoves("8/4P3/8/8/8/8/8/k6K w - - 0 1", "e7"))
+                .containsExactlyInAnyOrder("e7e8q", "e7e8r", "e7e8b", "e7e8n");
+    }
+
+    @Test
+    void captureOntoTheLastRankBecomesFourPromotions() {
+        // the knight on e8 blocks the step
+        assertThat(pawnMoves("3rn3/4P3/8/8/8/8/8/k6K w - - 0 1", "e7"))
+                .containsExactlyInAnyOrder("e7d8q", "e7d8r", "e7d8b", "e7d8n");
+    }
+
+    @Test
+    void blackPawnsPromoteOnRankOne() {
+        assertThat(pawnMoves("k6K/8/8/8/8/8/4p3/8 b - - 0 1", "e2"))
+                .containsExactlyInAnyOrder("e2e1q", "e2e1r", "e2e1b", "e2e1n");
+    }
+
+    @Test
+    void pawnBeforeTheSeventhRankDoesNotPromote() {
+        assertThat(pawnMoves("8/8/4P3/8/8/8/8/k6K w - - 0 1", "e6")).containsExactly("e6e7");
+    }
+
+    @Test
+    void legalMovesIncludeAllFourPromotions() {
+        assertThat(MoveGenerator.legalMoves(Fen.parse("8/4P3/8/8/8/8/8/k6K w - - 0 1")))
+                .map(Move::toString)
+                .contains("e7e8q", "e7e8r", "e7e8b", "e7e8n")
+                .doesNotContain("e7e8");
+    }
 
     @ParameterizedTest
     @CsvSource({
@@ -22,6 +57,13 @@ class PromotionTests {
     })
     void promotionPlacesTheChosenPieceInsteadOfThePawn(String fen, String uci, String expectedFen) {
         assertThat(Fen.toFen(Fen.parse(fen).play(move(uci)))).isEqualTo(expectedFen);
+    }
+
+    /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e7e8q"}. */
+    private static List<String> pawnMoves(String fen, String from) {
+        return MoveGenerator.pawnMoves(Fen.parse(fen), Square.of(from)).stream()
+                .map(Move::toString)
+                .toList();
     }
 
     /** Parses a move in UCI form, e.g. {@code "e2e4"} or {@code "e7e8q"}. */
