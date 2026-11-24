@@ -49,6 +49,8 @@ accounts and friends, and mobile.
 - Validate untrusted input where it enters the system (the REST API from M3). Inside the engine, only check what
   catches our own mistakes; no hardening against exotic input.
 - Tests that need the database use Testcontainers (`@Import(TestcontainersConfiguration.class)`); engine tests are plain JUnit.
+- Tests that take more than a few seconds (such as deep perft counts) get `@Tag("slow")`. `./gradlew test` and CI
+  leave them out; run them with `./gradlew slowTest`, for example before and after refactoring the engine.
 - Schema changes are new Flyway migrations `V<n>__description.sql` in `src/main/resources/db/migration`; never edit a merged one.
 - Never commit secrets. Never put passwords in `application.yaml` or `docker-compose.yml`.
 - Keep this file up to date with conventions and decisions.
