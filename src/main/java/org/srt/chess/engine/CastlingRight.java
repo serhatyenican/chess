@@ -2,6 +2,7 @@ package org.srt.chess.engine;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
@@ -97,6 +98,17 @@ public enum CastlingRight {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "unknown castling right letter '" + letter + "', expected one of KQkq"));
+    }
+
+    /**
+     * Returns the right whose castling this king move is, e.g. white kingside for {@code e1g1}, or an empty Optional
+     * for any other move. Only the squares are compared: the caller makes sure it is the king that moves.
+     */
+    static Optional<CastlingRight> fromKingMove(Move move) {
+        return Arrays.stream(VALUES)
+                .filter(right -> right.kingFrom.equals(move.from()))
+                .filter(right -> right.kingTo.equals(move.to()))
+                .findFirst();
     }
 
     /** Returns the squares from {@code from} to {@code to} on their rank, both included. */

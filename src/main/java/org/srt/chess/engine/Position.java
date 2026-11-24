@@ -66,7 +66,7 @@ public record Position(
         Piece piece = board.pieceAt(move.from())
                 .orElseThrow(() -> new IllegalArgumentException("no piece on " + move.from() + " to play " + move));
         boolean capture = board.pieceAt(move.to()).isPresent();
-        Board nextBoard = board.without(move.from()).with(move.to(), piece);
+        Board nextBoard = moveRookIfCastling(board.without(move.from()).with(move.to(), piece), piece, move);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
         int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
         return new Position(nextBoard, sideToMove.opposite(), castlingRightsAfter(move), enPassantSquare(piece, move),
@@ -82,6 +82,19 @@ public record Position(
         return castlingRights.stream()
                 .filter(right -> !touched.contains(right.kingFrom()) && !touched.contains(right.rookFrom()))
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns the board with the rook moved too if the move is a castle: the king moving two squares to castle.
+     */
+    private static Board moveRookIfCastling(Board board, Piece piece, Move move) {
+        if (piece.type() != PieceType.KING) {
+            return board;
+        }
+        return CastlingRight.fromKingMove(move)
+                .map(right -> board.without(right.rookFrom())
+                        .with(right.rookTo(), new Piece(piece.color(), PieceType.ROOK)))
+                .orElse(board);
     }
 
     /**
