@@ -35,7 +35,7 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. En passant and promotion are not generated yet.
+     * Returns the pseudo-legal moves of the side to move. Promotion is not generated yet.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -148,7 +148,7 @@ public final class MoveGenerator {
     /**
      * Returns the moves of the pawn on {@code from}, which belongs to the side to move: one step forward onto an empty
      * square, two steps from its starting rank if both squares are empty, and one step diagonally forward onto an
-     * enemy piece. En passant and promotion are not generated yet.
+     * enemy piece or, en passant, onto the en passant square. Promotion is not generated yet.
      */
     static List<Move> pawnMoves(Position position, Square from) {
         Color mover = position.sideToMove();
@@ -160,7 +160,7 @@ public final class MoveGenerator {
                 .takeWhile(to -> isEmpty(position, to));
         Stream<Square> captures = Stream.of(-1, 1)
                 .flatMap(fileDelta -> from.offset(fileDelta, forward).stream())
-                .filter(to -> isEnemy(position, to));
+                .filter(to -> isEnemy(position, to) || isEnPassantCapture(position, from, to));
         return Stream.concat(pushes, captures)
                 .map(to -> new Move(from, to))
                 .toList();
@@ -254,6 +254,17 @@ public final class MoveGenerator {
             next = next.get().offset(direction.fileDelta(), direction.rankDelta());
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns whether a pawn on {@code from} capturing diagonally onto {@code to} is an en passant capture: {@code to}
+     * is the en passant square and the enemy pawn that just double-stepped stands beside it.
+     */
+    private static boolean isEnPassantCapture(Position position, Square from, Square to) {
+        Square capturedPawn = new Square(to.file(), from.rank());
+        return to.equals(position.enPassant())
+                && position.board().pieceAt(capturedPawn)
+                        .equals(Optional.of(new Piece(position.sideToMove().opposite(), PieceType.PAWN)));
     }
 
     private static boolean isEmpty(Position position, Square square) {
