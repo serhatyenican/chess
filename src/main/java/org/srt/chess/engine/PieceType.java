@@ -1,6 +1,7 @@
 package org.srt.chess.engine;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,6 +17,8 @@ public enum PieceType {
 
     private static final PieceType[] VALUES = values();
 
+    private static final List<PieceType> PROMOTION_TYPES = List.of(QUEEN, ROOK, BISHOP, KNIGHT);
+
     private final char letter;
 
     PieceType(char letter) {
@@ -28,6 +31,20 @@ public enum PieceType {
      */
     public char letter() {
         return letter;
+    }
+
+    /**
+     * Returns whether a pawn can promote to this type: a queen, rook, bishop or knight, not a king or another pawn.
+     */
+    public boolean canPromoteTo() {
+        return PROMOTION_TYPES.contains(this);
+    }
+
+    /**
+     * Returns the types a pawn can promote to, strongest first: queen, rook, bishop, knight.
+     */
+    static List<PieceType> promotionTypes() {
+        return PROMOTION_TYPES;
     }
 
     /**

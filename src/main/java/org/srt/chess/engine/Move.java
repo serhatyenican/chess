@@ -18,7 +18,7 @@ public record Move(Square from, Square to, PieceType promotion) {
         if (from.equals(to)) {
             throw new IllegalArgumentException("from and to must differ, both were " + from);
         }
-        if (promotion == PieceType.KING || promotion == PieceType.PAWN) {
+        if (promotion != null && !promotion.canPromoteTo()) {
             throw new IllegalArgumentException("a pawn cannot promote to " + promotion);
         }
     }
