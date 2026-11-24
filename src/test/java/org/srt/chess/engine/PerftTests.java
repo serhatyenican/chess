@@ -1,5 +1,6 @@
 package org.srt.chess.engine;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -47,6 +48,7 @@ class PerftTests {
             "2, 191",
             "3, 2812",
             "4, 43238",
+            "5, 674624",
     })
     void position3(int depth, long expected) {
         assertThat(Perft.count(Fen.parse(POSITION_3), depth)).isEqualTo(expected);
@@ -58,6 +60,7 @@ class PerftTests {
             "1, 6",
             "2, 264",
             "3, 9467",
+            "4, 422333",
     })
     void position4(int depth, long expected) {
         assertThat(Perft.count(Fen.parse(POSITION_4), depth)).isEqualTo(expected);
@@ -72,6 +75,21 @@ class PerftTests {
     })
     void position5(int depth, long expected) {
         assertThat(Perft.count(Fen.parse(POSITION_5), depth)).isEqualTo(expected);
+    }
+
+    /**
+     * Deeper counts, a few million positions each, tagged slow so CI skips them. Run them with
+     * {@code ./gradlew slowTest}, for example before and after refactoring the engine.
+     */
+    @Tag("slow")
+    @ParameterizedTest(name = "{0} depth {1} -> {2}")
+    @CsvSource({
+            "'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 5, 4865609",
+            "'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1', 4, 4085603",
+            "'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8', 4, 2103487",
+    })
+    void deepCounts(String fen, int depth, long expected) {
+        assertThat(Perft.count(Fen.parse(fen), depth)).isEqualTo(expected);
     }
 
     @Test
