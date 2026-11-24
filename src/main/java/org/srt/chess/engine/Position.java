@@ -66,7 +66,9 @@ public record Position(
         Piece piece = board.pieceAt(move.from())
                 .orElseThrow(() -> new IllegalArgumentException("no piece on " + move.from() + " to play " + move));
         boolean capture = board.pieceAt(move.to()).isPresent();
-        Board nextBoard = moveRookIfCastling(board.without(move.from()).with(move.to(), piece), piece, move);
+        Board nextBoard = board.without(move.from()).with(move.to(), piece);
+        nextBoard = moveRookIfCastling(nextBoard, piece, move);
+        nextBoard = removePawnIfEnPassant(nextBoard, piece, move, enPassant);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
         int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
         return new Position(nextBoard, sideToMove.opposite(), castlingRightsAfter(move), enPassantSquare(piece, move),
@@ -95,6 +97,17 @@ public record Position(
                 .map(right -> board.without(right.rookFrom())
                         .with(right.rookTo(), new Piece(piece.color(), PieceType.ROOK)))
                 .orElse(board);
+    }
+
+    /**
+     * Returns the board without the captured pawn if the move is an en passant capture: a pawn moving onto the en
+     * passant square. The captured pawn stands beside the target square, on the capturing pawn's rank.
+     */
+    private static Board removePawnIfEnPassant(Board board, Piece piece, Move move, Square enPassant) {
+        if (piece.type() != PieceType.PAWN || !move.to().equals(enPassant)) {
+            return board;
+        }
+        return board.without(new Square(move.to().file(), move.from().rank()));
     }
 
     /**
