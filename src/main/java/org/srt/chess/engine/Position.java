@@ -2,6 +2,7 @@ package org.srt.chess.engine;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,8 @@ public record Position(
         Piece piece = board.pieceAt(move.from())
                 .orElseThrow(() -> new IllegalArgumentException("no piece on " + move.from() + " to play " + move));
         boolean capture = board.pieceAt(move.to()).isPresent();
-        Board nextBoard = board.without(move.from()).with(move.to(), piece);
+        Piece placed = move.isPromotion() ? new Piece(piece.color(), move.promotion()) : piece;
+        Board nextBoard = board.without(move.from()).with(move.to(), placed);
         nextBoard = moveRookIfCastling(nextBoard, piece, move);
         nextBoard = removePawnIfEnPassant(nextBoard, piece, move, enPassant);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
