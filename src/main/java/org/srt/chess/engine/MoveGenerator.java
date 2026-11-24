@@ -35,7 +35,7 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Promotion is not generated yet.
+     * Returns the pseudo-legal moves of the side to move.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -148,7 +148,8 @@ public final class MoveGenerator {
     /**
      * Returns the moves of the pawn on {@code from}, which belongs to the side to move: one step forward onto an empty
      * square, two steps from its starting rank if both squares are empty, and one step diagonally forward onto an
-     * enemy piece or, en passant, onto the en passant square. Promotion is not generated yet.
+     * enemy piece or, en passant, onto the en passant square. A move onto the last rank becomes four moves, one per
+     * piece the pawn can promote to.
      */
     static List<Move> pawnMoves(Position position, Square from) {
         Color mover = position.sideToMove();
@@ -162,7 +163,9 @@ public final class MoveGenerator {
                 .flatMap(fileDelta -> from.offset(fileDelta, forward).stream())
                 .filter(to -> pawnCanCaptureOn(position, from, to));
         return Stream.concat(pushes, captures)
-                .map(to -> new Move(from, to))
+                .flatMap(to -> to.rank() == lastRank(mover)
+                        ? PieceType.promotionTypes().stream().map(type -> new Move(from, to, type))
+                        : Stream.of(new Move(from, to)))
                 .toList();
     }
 
@@ -293,6 +296,11 @@ public final class MoveGenerator {
     /** Returns the rank pawns of the given color start on: rank 2 for white, rank 7 for black. */
     private static int startRank(Color color) {
         return color == Color.WHITE ? 1 : 6;
+    }
+
+    /** Returns the rank pawns of the given color promote on: rank 8 for white, rank 1 for black. */
+    private static int lastRank(Color color) {
+        return color == Color.WHITE ? 7 : 0;
     }
 
     private record Offset(int fileDelta, int rankDelta) {
