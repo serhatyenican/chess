@@ -160,7 +160,7 @@ public final class MoveGenerator {
                 .takeWhile(to -> isEmpty(position, to));
         Stream<Square> captures = Stream.of(-1, 1)
                 .flatMap(fileDelta -> from.offset(fileDelta, forward).stream())
-                .filter(to -> isEnemy(position, to) || isEnPassantCapture(position, from, to));
+                .filter(to -> pawnCanCaptureOn(position, from, to));
         return Stream.concat(pushes, captures)
                 .map(to -> new Move(from, to))
                 .toList();
@@ -254,6 +254,13 @@ public final class MoveGenerator {
             next = next.get().offset(direction.fileDelta(), direction.rankDelta());
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns whether the pawn on {@code from} can capture diagonally onto {@code to}: an enemy piece, or en passant.
+     */
+    private static boolean pawnCanCaptureOn(Position position, Square from, Square to) {
+        return isEnemy(position, to) || isEnPassantCapture(position, from, to);
     }
 
     /**
