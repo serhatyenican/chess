@@ -1,6 +1,8 @@
 package org.srt.chess.engine;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 
@@ -59,11 +61,36 @@ class CastlingTests {
                 .containsExactlyInAnyOrder("e1g1", "e1c1");
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "w, e1g1, r3k2r/8/8/8/8/8/8/R4RK1 b kq - 1 1",
+            "w, e1c1, r3k2r/8/8/8/8/8/8/2KR3R b kq - 1 1",
+            "b, e8g8, r4rk1/8/8/8/8/8/8/R3K2R w KQ - 1 2",
+            "b, e8c8, 2kr3r/8/8/8/8/8/8/R3K2R w KQ - 1 2",
+    })
+    void castlingMovesTheRookToTheSquareTheKingCrossed(String sideToMove, String castle, String expectedFen) {
+        Position position = Fen.parse("r3k2r/8/8/8/8/8/8/R3K2R " + sideToMove + " KQkq - 0 1");
+
+        assertThat(Fen.toFen(position.play(move(castle)))).isEqualTo(expectedFen);
+    }
+
+    @Test
+    void otherPiecesMovingBetweenTheCastlingSquaresDoNotMoveTheRook() {
+        // the queen slides from e1 to g1, like a kingside castle of the king
+        Position position = Fen.parse("4k3/8/8/8/8/8/8/R3Q2R w - - 0 1");
+
+        assertThat(Fen.toFen(position.play(move("e1g1")))).isEqualTo("4k3/8/8/8/8/8/8/R5QR b - - 1 1");
+    }
+
     /** Returns the castling moves of the king on {@code from} in UCI form: its moves two files sideways. */
     private static List<String> castlingMoves(String fen, String from) {
         return MoveGenerator.kingMoves(Fen.parse(fen), Square.of(from)).stream()
                 .filter(move -> Math.abs(move.to().file().ordinal() - move.from().file().ordinal()) == 2)
                 .map(Move::toString)
                 .toList();
+    }
+
+    private static Move move(String uci) {
+        return new Move(Square.of(uci.substring(0, 2)), Square.of(uci.substring(2, 4)));
     }
 }
