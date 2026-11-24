@@ -46,6 +46,34 @@ public final class MoveGenerator {
                 .toList();
     }
 
+    /**
+     * Returns the legal moves of the side to move: the pseudo-legal moves that don't leave its own king attacked.
+     * Each move is played and the king checked afterwards, which also covers pins and moving the king into check.
+     */
+    public static List<Move> legalMoves(Position position) {
+        Color mover = position.sideToMove();
+        return generate(position).stream()
+                .filter(move -> !isKingAttacked(position.play(move).board(), mover))
+                .toList();
+    }
+
+    /**
+     * Returns whether the king of the side to move is attacked. A position without that king is never in check.
+     */
+    public static boolean isInCheck(Position position) {
+        return isKingAttacked(position.board(), position.sideToMove());
+    }
+
+    // Takes the king's color explicitly: after a move is played, the side to move is already the opponent.
+    private static boolean isKingAttacked(Board board, Color kingColor) {
+        Piece king = new Piece(kingColor, PieceType.KING);
+        return Square.all().stream()
+                .filter(square -> board.pieceAt(square).filter(king::equals).isPresent())
+                .findFirst()
+                .map(square -> isAttacked(board, square, kingColor.opposite()))
+                .orElse(false);
+    }
+
     private static List<Move> movesOf(Position position, Square from, PieceType type) {
         return switch (type) {
             case KING -> kingMoves(position, from);
