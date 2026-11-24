@@ -35,7 +35,7 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the pseudo-legal moves of the side to move. Castling, en passant and promotion are not generated yet.
+     * Returns the pseudo-legal moves of the side to move. En passant and promotion are not generated yet.
      */
     public static List<Move> generate(Position position) {
         Color mover = position.sideToMove();
@@ -87,10 +87,27 @@ public final class MoveGenerator {
 
     /**
      * Returns the moves of the king on {@code from}, which belongs to the side to move: one step in each of the eight
-     * directions, each to an empty square or a capture. Castling is not included.
+     * directions, each to an empty square or a capture, plus castling where it is possible.
      */
     static List<Move> kingMoves(Position position, Square from) {
-        return stepMoves(position, from, KING_STEPS);
+        return Stream.concat(stepMoves(position, from, KING_STEPS).stream(), castlingMoves(position, from))
+                .toList();
+    }
+
+    /**
+     * Returns the castling moves of the king on {@code from}: for each castling right of the side to move, if the
+     * squares between king and rook are empty and none of the king's squares (start, crossed, target) is attacked.
+     */
+    private static Stream<Move> castlingMoves(Position position, Square from) {
+        Color mover = position.sideToMove();
+        Board board = position.board();
+        return position.castlingRights().stream()
+                .filter(right -> right.color() == mover)
+                .filter(right -> right.kingFrom().equals(from))
+                .filter(right -> right.squaresBetween().stream().allMatch(square -> board.pieceAt(square).isEmpty()))
+                .filter(right -> right.kingPath().stream()
+                        .noneMatch(square -> isAttacked(board, square, mover.opposite())))
+                .map(right -> new Move(right.kingFrom(), right.kingTo()));
     }
 
     /**
