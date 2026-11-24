@@ -95,8 +95,9 @@ public final class MoveGenerator {
     }
 
     /**
-     * Returns the castling moves of the king on {@code from}: for each castling right of the side to move, if the
-     * squares between king and rook are empty and none of the king's squares (start, crossed, target) is attacked.
+     * Returns the castling moves of the king on {@code from}: for each castling right of the side to move, if its
+     * rook is in place, the squares between king and rook are empty and none of the king's squares (start, crossed,
+     * target) is attacked.
      */
     private static Stream<Move> castlingMoves(Position position, Square from) {
         Color mover = position.sideToMove();
@@ -104,6 +105,7 @@ public final class MoveGenerator {
         return position.castlingRights().stream()
                 .filter(right -> right.color() == mover)
                 .filter(right -> right.kingFrom().equals(from))
+                .filter(right -> board.pieceAt(right.rookFrom()).equals(Optional.of(new Piece(mover, PieceType.ROOK))))
                 .filter(right -> right.squaresBetween().stream().allMatch(square -> board.pieceAt(square).isEmpty()))
                 .filter(right -> right.kingPath().stream()
                         .noneMatch(square -> isAttacked(board, square, mover.opposite())))

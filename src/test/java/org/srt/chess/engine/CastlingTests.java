@@ -29,6 +29,12 @@ class CastlingTests {
     }
 
     @Test
+    void noCastlingWithoutTheRookEvenIfTheRightIsSet() {
+        // a hand-written FEN can claim a right whose rook isn't there
+        assertThat(castlingMoves("4k3/8/8/8/8/8/8/4K3 w K - 0 1", "e1")).isEmpty();
+    }
+
+    @Test
     void noCastlingWithAPieceBetweenKingAndRook() {
         // the knight on b1 blocks queenside: the b-square must be empty too
         assertThat(castlingMoves("r3k2r/8/8/8/8/8/8/RN2K2R w KQkq - 0 1", "e1")).containsExactly("e1g1");
