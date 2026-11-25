@@ -61,6 +61,16 @@ public final class Board {
     }
 
     /**
+     * Returns whether a piece of {@code byColor} attacks the square, i.e. could capture a piece standing there. Own
+     * pieces count too, so a defended piece is attacked by its own side. Each piece type's movement looks outward
+     * from the square for an attacker of its own type.
+     */
+    boolean isAttacked(Square square, Color byColor) {
+        return Arrays.stream(PieceType.values())
+                .anyMatch(type -> type.movement().attacks(this, square, new Piece(byColor, type)));
+    }
+
+    /**
      * Returns a new board with the piece on the square, replacing whatever stood there.
      */
     public Board with(Square square, Piece piece) {

@@ -36,7 +36,7 @@ final class KingMovement implements Movement {
                 .filter(right -> board.isOccupiedBy(right.rookFrom(), rook))
                 .filter(right -> right.squaresBetween().stream().allMatch(board::isEmpty))
                 .filter(right -> right.kingPath().stream()
-                        .noneMatch(square -> position.isAttacked(square, mover.opposite())))
+                        .noneMatch(square -> board.isAttacked(square, mover.opposite())))
                 .map(right -> new Move(right.kingFrom(), right.kingTo()));
     }
 }

@@ -1,6 +1,5 @@
 package org.srt.chess.engine;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -156,16 +155,7 @@ public record Position(
         return Square.all().stream()
                 .filter(square -> board.isOccupiedBy(square, king))
                 .findFirst()
-                .map(square -> isAttacked(square, kingColor.opposite()))
+                .map(square -> board.isAttacked(square, kingColor.opposite()))
                 .orElse(false);
-    }
-
-    /**
-     * Returns whether a piece of {@code byColor} attacks {@code square}, i.e. could capture a piece standing there.
-     * Each piece type's movement looks outward from the square for an attacker of its own type.
-     */
-    boolean isAttacked(Square square, Color byColor) {
-        return Arrays.stream(PieceType.values())
-                .anyMatch(type -> type.movement().attacks(board, square, new Piece(byColor, type)));
     }
 }
