@@ -8,21 +8,23 @@ import java.util.Optional;
  * The six kinds of chess pieces, without color. A colored piece is a {@link Piece}.
  */
 public enum PieceType {
-    KING('k'),
-    QUEEN('q'),
-    ROOK('r'),
-    BISHOP('b'),
-    KNIGHT('n'),
-    PAWN('p');
+    KING('k', new KingMovement()),
+    QUEEN('q', new Sliding(Offset.QUEEN_DIRECTIONS)),
+    ROOK('r', new Sliding(Offset.ROOK_DIRECTIONS)),
+    BISHOP('b', new Sliding(Offset.BISHOP_DIRECTIONS)),
+    KNIGHT('n', new Stepping(Offset.KNIGHT_JUMPS)),
+    PAWN('p', new PawnMovement());
 
     private static final PieceType[] VALUES = values();
 
     private static final List<PieceType> PROMOTION_TYPES = List.of(QUEEN, ROOK, BISHOP, KNIGHT);
 
     private final char letter;
+    private final Movement movement;
 
-    PieceType(char letter) {
+    PieceType(char letter, Movement movement) {
         this.letter = letter;
+        this.movement = movement;
     }
 
     /**
@@ -31,6 +33,13 @@ public enum PieceType {
      */
     public char letter() {
         return letter;
+    }
+
+    /**
+     * Returns how pieces of this type move and attack.
+     */
+    Movement movement() {
+        return movement;
     }
 
     /**

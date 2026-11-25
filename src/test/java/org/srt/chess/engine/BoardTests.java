@@ -101,4 +101,31 @@ class BoardTests {
                 . . . . K . . .
                 """);
     }
+
+    @Test
+    void isEmptyOnlyWhereNoPieceStands() {
+        Board board = Board.empty().with(E1, WHITE_KING);
+
+        assertThat(board.isEmpty(E1)).isFalse();
+        assertThat(board.isEmpty(E8)).isTrue();
+    }
+
+    @Test
+    void isOccupiedByAColorChecksTheColorOfThePiece() {
+        Board board = Board.empty().with(E1, WHITE_KING);
+
+        assertThat(board.isOccupiedBy(E1, Color.WHITE)).isTrue();
+        assertThat(board.isOccupiedBy(E1, Color.BLACK)).isFalse();
+        assertThat(board.isOccupiedBy(E8, Color.WHITE)).isFalse();
+    }
+
+    @Test
+    void isOccupiedByAPieceChecksColorAndType() {
+        Board board = Board.empty().with(E1, WHITE_KING);
+
+        assertThat(board.isOccupiedBy(E1, WHITE_KING)).isTrue();
+        assertThat(board.isOccupiedBy(E1, WHITE_QUEEN)).isFalse();
+        assertThat(board.isOccupiedBy(E1, BLACK_KING)).isFalse();
+        assertThat(board.isOccupiedBy(E8, WHITE_KING)).isFalse();
+    }
 }

@@ -75,7 +75,7 @@ class EnPassantTests {
 
     /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e5d6"}. */
     private static List<String> pawnMoves(Position position, String from) {
-        return position.pawnMoves(Square.of(from)).stream()
+        return PieceType.PAWN.movement().moves(position, Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
