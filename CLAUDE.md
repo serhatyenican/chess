@@ -33,7 +33,7 @@ See `docs/adr/` for the reasoning behind each choice.
 Read `docs/adr/` before changing the stack or structure. Record new significant decisions there as a new ADR.
 
 ## Roadmap
-Planning hierarchy: version > milestone > issue. Each version has a version issue (label `version`) that holds its
+Planning hierarchy: version > milestone > issue. Each version has a version issue (label `type: version`) that holds its
 goal, scope and "done when" list. Its milestones are named `v<n> · M<n> ...`, and every task issue belongs to one
 milestone and is a sub-issue of its version issue. When a version is done: close its version issue, tag `v<n>.0.0`
 and publish a GitHub Release.
