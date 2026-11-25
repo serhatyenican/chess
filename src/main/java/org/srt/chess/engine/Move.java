@@ -31,8 +31,36 @@ public record Move(Square from, Square to, PieceType promotion) {
         this(from, to, null);
     }
 
+    /**
+     * Parses a move in UCI notation, e.g. {@code "e2e4"} or {@code "e7e8q"}, the inverse of {@link #toString()}.
+     * Says nothing about whether the move is legal.
+     *
+     * @throws IllegalArgumentException if the text is not a valid move
+     */
+    public static Move of(String text) {
+        if (text == null || text.length() < 4 || text.length() > 5) {
+            throw invalidText(text);
+        }
+        Square from = Square.of(text.substring(0, 2));
+        Square to = Square.of(text.substring(2, 4));
+        return text.length() == 4
+                ? new Move(from, to)
+                : new Move(from, to, promotionFrom(text.charAt(4)));
+    }
+
     public boolean isPromotion() {
         return promotion != null;
+    }
+
+    private static PieceType promotionFrom(char letter) {
+        return PieceType.fromLetter(letter)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Invalid promotion letter '" + letter + "': expected q, r, b or n"));
+    }
+
+    private static IllegalArgumentException invalidText(String text) {
+        return new IllegalArgumentException("Invalid move \"" + text
+                + "\": expected two squares and an optional promotion letter, e.g. \"e2e4\" or \"e7e8q\"");
     }
 
     /**
