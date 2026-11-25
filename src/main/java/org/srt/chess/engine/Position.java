@@ -58,7 +58,7 @@ public record Position(
 
     /**
      * Returns the position after playing the move, leaving this position unchanged. The move is not validated: it is
-     * expected to come from the move generator.
+     * expected to come from {@link #legalMoves()}.
      *
      * @throws IllegalArgumentException if there is no piece on the move's start square
      */
@@ -67,10 +67,7 @@ public record Position(
         Piece piece = board.pieceAt(move.from())
                 .orElseThrow(() -> new IllegalArgumentException("no piece on " + move.from() + " to play " + move));
         boolean capture = board.pieceAt(move.to()).isPresent();
-        Piece placed = move.isPromotion() ? new Piece(piece.color(), move.promotion()) : piece;
-        Board nextBoard = board.without(move.from()).with(move.to(), placed);
-        nextBoard = moveRookIfCastling(nextBoard, piece, move);
-        nextBoard = removePawnIfEnPassant(nextBoard, piece, move, enPassant);
+        Board nextBoard = piece.type().movement().play(this, piece, move);
         int nextHalfmoveClock = piece.type() == PieceType.PAWN || capture ? 0 : halfmoveClock + 1;
         int nextFullmoveNumber = sideToMove == Color.BLACK ? fullmoveNumber + 1 : fullmoveNumber;
         return new Position(nextBoard, sideToMove.opposite(), castlingRightsAfter(move), enPassantSquare(piece, move),
@@ -86,30 +83,6 @@ public record Position(
         return castlingRights.stream()
                 .filter(right -> !touched.contains(right.kingFrom()) && !touched.contains(right.rookFrom()))
                 .collect(Collectors.toSet());
-    }
-
-    /**
-     * Returns the board with the rook moved too if the move is a castle: the king moving two squares to castle.
-     */
-    private static Board moveRookIfCastling(Board board, Piece piece, Move move) {
-        if (piece.type() != PieceType.KING) {
-            return board;
-        }
-        return CastlingRight.fromKingMove(move)
-                .map(right -> board.without(right.rookFrom())
-                        .with(right.rookTo(), new Piece(piece.color(), PieceType.ROOK)))
-                .orElse(board);
-    }
-
-    /**
-     * Returns the board without the captured pawn if the move is an en passant capture: a pawn moving onto the en
-     * passant square. The captured pawn stands beside the target square, on the capturing pawn's rank.
-     */
-    private static Board removePawnIfEnPassant(Board board, Piece piece, Move move, Square enPassant) {
-        if (piece.type() != PieceType.PAWN || !move.to().equals(enPassant)) {
-            return board;
-        }
-        return board.without(new Square(move.to().file(), move.from().rank()));
     }
 
     /**

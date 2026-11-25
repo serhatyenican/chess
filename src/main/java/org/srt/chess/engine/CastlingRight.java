@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 /**
  * One of the four castling rights. A right only says castling is still allowed later (king and rook haven't moved);
- * whether castling is possible right now is decided by the move generator.
+ * whether castling is possible right now is decided when generating the legal moves.
  * <p>
  * Each right knows its squares: when castling, the king moves two squares from {@code kingFrom} to {@code kingTo},
  * and the rook from {@code rookFrom} to {@code rookTo}, the square the king crossed.

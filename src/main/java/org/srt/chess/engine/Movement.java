@@ -19,4 +19,12 @@ sealed interface Movement permits Stepping, Sliding, KingMovement, PawnMovement 
      * board, i.e. could capture a piece standing there. Looks outward from the target for the attacker.
      */
     boolean attacks(Board board, Square target, Piece attacker);
+
+    /**
+     * Returns the board after {@code piece} plays the move in this position. By default the piece leaves its square
+     * and lands on the target, replacing any piece captured there; the king and the pawn add their special moves.
+     */
+    default Board play(Position position, Piece piece, Move move) {
+        return position.board().without(move.from()).with(move.to(), piece);
+    }
 }

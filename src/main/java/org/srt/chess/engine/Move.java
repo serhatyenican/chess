@@ -8,7 +8,8 @@ import java.util.Objects;
  * {@code promotion} is the piece a pawn turns into when it reaches the last rank, and {@code null} for every other
  * move. A pawn can only promote to a queen, rook, bishop or knight.
  * <p>
- * A move is only a description. Whether it is legal in a position is decided by the move generator, not here.
+ * A move is only a description. Whether it is legal in a position is decided by {@link Position#legalMoves()}, not
+ * here.
  */
 public record Move(Square from, Square to, PieceType promotion) {
 

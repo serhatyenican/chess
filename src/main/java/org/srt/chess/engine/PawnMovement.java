@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 /**
  * The pawn: one step forward onto an empty square, two steps from its starting rank if both squares are empty, and
  * one step diagonally forward onto an enemy piece or, en passant, onto the en passant square. A move onto the last
- * rank becomes four moves, one per piece the pawn can promote to. Unlike the other pieces it moves in one direction
- * only, which depends on its color, and it captures differently from how it moves.
+ * rank becomes four moves, one per piece the pawn can promote to, and playing it places that piece. Unlike the other
+ * pieces it moves in one direction only, which depends on its color, and it captures differently from how it moves.
  */
 final class PawnMovement implements Movement {
 
@@ -43,6 +43,21 @@ final class PawnMovement implements Movement {
         return Stream.of(-1, 1)
                 .flatMap(fileDelta -> target.offset(fileDelta, backward).stream())
                 .anyMatch(from -> board.isOccupiedBy(from, attacker));
+    }
+
+    /**
+     * Places the promoted piece instead of the pawn on a promotion, and removes the captured pawn on an en passant
+     * capture: a pawn moving onto the en passant square. The captured pawn stands beside the target square, on the
+     * capturing pawn's rank.
+     */
+    @Override
+    public Board play(Position position, Piece pawn, Move move) {
+        Piece placed = move.isPromotion() ? new Piece(pawn.color(), move.promotion()) : pawn;
+        Board board = Movement.super.play(position, placed, move);
+        if (move.to().equals(position.enPassant())) {
+            board = board.without(new Square(move.to().file(), move.from().rank()));
+        }
+        return board;
     }
 
     /**
