@@ -49,10 +49,10 @@ class AttackTests {
     @Test
     void ownPiecesAreAttackedTooSoTheyCountAsDefended() {
         // the rook on a1 defends the knight on a4, but the knight blocks the rook beyond it
-        Board board = Fen.parse("8/8/8/8/N7/8/8/R7 w - - 0 1").board();
+        Position position = Fen.parse("8/8/8/8/N7/8/8/R7 w - - 0 1");
 
-        assertThat(MoveGenerator.isAttacked(board, Square.of("a4"), Color.WHITE)).isTrue();
-        assertThat(MoveGenerator.isAttacked(board, Square.of("a7"), Color.WHITE)).isFalse();
+        assertThat(position.isAttacked(Square.of("a4"), Color.WHITE)).isTrue();
+        assertThat(position.isAttacked(Square.of("a7"), Color.WHITE)).isFalse();
     }
 
     @Test
@@ -62,9 +62,9 @@ class AttackTests {
 
     /** Returns every square attacked by {@code byColor} in the FEN position, e.g. {@code "e4"}. */
     private static List<String> attackedSquares(String fen, Color byColor) {
-        Board board = Fen.parse(fen).board();
+        Position position = Fen.parse(fen);
         return Square.all().stream()
-                .filter(square -> MoveGenerator.isAttacked(board, square, byColor))
+                .filter(square -> position.isAttacked(square, byColor))
                 .map(Square::toString)
                 .toList();
     }

@@ -36,7 +36,7 @@ class PromotionTests {
 
     @Test
     void legalMovesIncludeAllFourPromotions() {
-        assertThat(MoveGenerator.legalMoves(Fen.parse("8/4P3/8/8/8/8/8/k6K w - - 0 1")))
+        assertThat(Fen.parse("8/4P3/8/8/8/8/8/k6K w - - 0 1").legalMoves())
                 .map(Move::toString)
                 .contains("e7e8q", "e7e8r", "e7e8b", "e7e8n")
                 .doesNotContain("e7e8");
@@ -61,7 +61,7 @@ class PromotionTests {
 
     /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e7e8q"}. */
     private static List<String> pawnMoves(String fen, String from) {
-        return MoveGenerator.pawnMoves(Fen.parse(fen), Square.of(from)).stream()
+        return Fen.parse(fen).pawnMoves(Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }

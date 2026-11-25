@@ -22,7 +22,7 @@ final class Perft {
         if (depth == 0) {
             return 1;
         }
-        return MoveGenerator.legalMoves(position).stream()
+        return position.legalMoves().stream()
                 .mapToLong(move -> count(position.play(move), depth - 1))
                 .sum();
     }
@@ -39,7 +39,7 @@ final class Perft {
             throw new IllegalArgumentException("divide needs a depth of at least 1, got " + depth);
         }
         // two legal moves never share a UCI string, so the merge function only selects the TreeMap overload
-        return MoveGenerator.legalMoves(position).stream()
+        return position.legalMoves().stream()
                 .collect(Collectors.toMap(
                         Move::toString,
                         move -> count(position.play(move), depth - 1),

@@ -47,7 +47,7 @@ class EnPassantTests {
         Position position = Fen.parse("8/8/8/KPp4r/8/8/8/7k w - c6 0 1");
 
         assertThat(pawnMoves(position, "b5")).contains("b5c6");
-        assertThat(MoveGenerator.legalMoves(position)).map(Move::toString).doesNotContain("b5c6");
+        assertThat(position.legalMoves()).map(Move::toString).doesNotContain("b5c6");
     }
 
     @Test
@@ -75,7 +75,7 @@ class EnPassantTests {
 
     /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e5d6"}. */
     private static List<String> pawnMoves(Position position, String from) {
-        return MoveGenerator.pawnMoves(position, Square.of(from)).stream()
+        return position.pawnMoves(Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }

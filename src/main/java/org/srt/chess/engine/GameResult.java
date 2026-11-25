@@ -24,10 +24,10 @@ public record GameResult(GameState state, Optional<Color> winner) {
      * move, since the mated side is always the one to move. The legal moves are generated once.
      */
     public static GameResult of(Position position) {
-        if (!MoveGenerator.legalMoves(position).isEmpty()) {
+        if (!position.legalMoves().isEmpty()) {
             return new GameResult(GameState.IN_PROGRESS, Optional.empty());
         }
-        return MoveGenerator.isInCheck(position)
+        return position.isInCheck()
                 ? new GameResult(GameState.CHECKMATE, Optional.of(position.sideToMove().opposite()))
                 : new GameResult(GameState.DRAW, Optional.empty());
     }
