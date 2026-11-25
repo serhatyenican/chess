@@ -61,7 +61,7 @@ class PromotionTests {
 
     /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e7e8q"}. */
     private static List<String> pawnMoves(String fen, String from) {
-        return Fen.parse(fen).pawnMoves(Square.of(from)).stream()
+        return PieceType.PAWN.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }

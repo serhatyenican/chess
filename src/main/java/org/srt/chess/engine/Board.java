@@ -39,6 +39,28 @@ public final class Board {
     }
 
     /**
+     * Returns whether no piece stands on the square.
+     */
+    boolean isEmpty(Square square) {
+        return squares[index(square)] == null;
+    }
+
+    /**
+     * Returns whether a piece of the given color stands on the square.
+     */
+    boolean isOccupiedBy(Square square, Color color) {
+        Piece piece = squares[index(square)];
+        return piece != null && piece.color() == color;
+    }
+
+    /**
+     * Returns whether exactly this piece, in color and type, stands on the square.
+     */
+    boolean isOccupiedBy(Square square, Piece piece) {
+        return piece.equals(squares[index(square)]);
+    }
+
+    /**
      * Returns a new board with the piece on the square, replacing whatever stood there.
      */
     public Board with(Square square, Piece piece) {

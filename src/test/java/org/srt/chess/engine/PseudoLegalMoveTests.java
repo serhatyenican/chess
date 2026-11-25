@@ -283,42 +283,42 @@ class PseudoLegalMoveTests {
 
     /** Returns the knight's moves from {@code from} in UCI form, e.g. {@code "a1b3"}. */
     private static List<String> knightMoves(String fen, String from) {
-        return Fen.parse(fen).knightMoves(Square.of(from)).stream()
+        return PieceType.KNIGHT.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
 
     /** Returns the pawn's moves from {@code from} in UCI form, e.g. {@code "e2e4"}. */
     private static List<String> pawnMoves(String fen, String from) {
-        return Fen.parse(fen).pawnMoves(Square.of(from)).stream()
+        return PieceType.PAWN.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
 
     /** Returns the queen's moves from {@code from} in UCI form, e.g. {@code "d1h5"}. */
     private static List<String> queenMoves(String fen, String from) {
-        return Fen.parse(fen).queenMoves(Square.of(from)).stream()
+        return PieceType.QUEEN.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
 
     /** Returns the rook's moves from {@code from} in UCI form, e.g. {@code "a1a8"}. */
     private static List<String> rookMoves(String fen, String from) {
-        return Fen.parse(fen).rookMoves(Square.of(from)).stream()
+        return PieceType.ROOK.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
 
     /** Returns the bishop's moves from {@code from} in UCI form, e.g. {@code "c1h6"}. */
     private static List<String> bishopMoves(String fen, String from) {
-        return Fen.parse(fen).bishopMoves(Square.of(from)).stream()
+        return PieceType.BISHOP.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
 
     /** Returns the king's moves from {@code from} in UCI form, e.g. {@code "e1e2"}. */
     private static List<String> kingMoves(String fen, String from) {
-        return Fen.parse(fen).kingMoves(Square.of(from)).stream()
+        return PieceType.KING.movement().moves(Fen.parse(fen), Square.of(from)).stream()
                 .map(Move::toString)
                 .toList();
     }
