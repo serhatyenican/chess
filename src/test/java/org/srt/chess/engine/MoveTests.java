@@ -116,7 +116,7 @@ class MoveTests {
     void rejectsTextWithAnInvalidSquare(String text) {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> Move.of(text))
-                .withMessageStartingWith("Invalid square");
+                .withMessageStartingWith("Invalid move \"" + text + "\": Invalid square \"");
     }
 
     @ParameterizedTest
@@ -124,7 +124,8 @@ class MoveTests {
     void rejectsTextWithAnUnknownPromotionLetter(String text) {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> Move.of(text))
-                .withMessage("Invalid promotion letter '" + text.charAt(4) + "': expected q, r, b or n");
+                .withMessage("Invalid move \"" + text + "\": unknown promotion letter '" + text.charAt(4)
+                        + "', expected q, r, b or n");
     }
 
     @ParameterizedTest
@@ -133,7 +134,9 @@ class MoveTests {
             "e7e8p, a pawn cannot promote to PAWN",
             "e2e2,  'from and to must differ, both were e2'",
     })
-    void rejectsTextOfAnImpossibleMove(String text, String message) {
-        assertThatIllegalArgumentException().isThrownBy(() -> Move.of(text)).withMessage(message);
+    void rejectsTextOfAnImpossibleMove(String text, String reason) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> Move.of(text))
+                .withMessage("Invalid move \"" + text + "\": " + reason);
     }
 }
