@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 /**
  * The king: one step in each of the eight directions, plus castling where it is possible. Castling never captures,
- * so the king attacks only the squares around it.
+ * so the king attacks only the squares around it; playing a castle moves the rook too.
  */
 final class KingMovement implements Movement {
 
@@ -19,6 +19,18 @@ final class KingMovement implements Movement {
     @Override
     public boolean attacks(Board board, Square target, Piece attacker) {
         return STEPS.attacks(board, target, attacker);
+    }
+
+    /**
+     * Moves the rook too if the move is a castle: the king moving two squares to castle.
+     */
+    @Override
+    public Board play(Position position, Piece king, Move move) {
+        Board board = Movement.super.play(position, king, move);
+        return CastlingRight.fromKingMove(move)
+                .map(right -> board.without(right.rookFrom())
+                        .with(right.rookTo(), new Piece(king.color(), PieceType.ROOK)))
+                .orElse(board);
     }
 
     /**
