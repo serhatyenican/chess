@@ -90,7 +90,7 @@ class CastlingTests {
 
     /** Returns the castling moves of the king on {@code from} in UCI form: its moves two files sideways. */
     private static List<String> castlingMoves(String fen, String from) {
-        return MoveGenerator.kingMoves(Fen.parse(fen), Square.of(from)).stream()
+        return Fen.parse(fen).kingMoves(Square.of(from)).stream()
                 .filter(move -> Math.abs(move.to().file().ordinal() - move.from().file().ordinal()) == 2)
                 .map(Move::toString)
                 .toList();

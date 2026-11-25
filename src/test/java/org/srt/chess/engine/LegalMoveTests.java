@@ -10,19 +10,19 @@ class LegalMoveTests {
 
     @Test
     void startingPositionIsNotCheckAndHasTwentyLegalMoves() {
-        assertThat(MoveGenerator.isInCheck(Position.starting())).isFalse();
-        assertThat(MoveGenerator.legalMoves(Position.starting())).hasSize(20);
+        assertThat(Position.starting().isInCheck()).isFalse();
+        assertThat(Position.starting().legalMoves()).hasSize(20);
     }
 
     @Test
     void kingAttackedByTheOpponentIsInCheck() {
         // black king on e8, white rook on e1
-        assertThat(MoveGenerator.isInCheck(Fen.parse("4k3/8/8/8/8/8/8/4R3 b - - 0 1"))).isTrue();
+        assertThat(Fen.parse("4k3/8/8/8/8/8/8/4R3 b - - 0 1").isInCheck()).isTrue();
     }
 
     @Test
     void positionWithoutAKingIsNotInCheck() {
-        assertThat(MoveGenerator.isInCheck(Fen.parse("8/8/8/8/3N4/8/8/8 w - - 0 1"))).isFalse();
+        assertThat(Fen.parse("8/8/8/8/3N4/8/8/8 w - - 0 1").isInCheck()).isFalse();
     }
 
     @Test
@@ -72,7 +72,7 @@ class LegalMoveTests {
 
     /** Returns the legal moves of the side to move in UCI form, e.g. {@code "e2e4"}. */
     private static List<String> legalMoves(String fen) {
-        return MoveGenerator.legalMoves(Fen.parse(fen)).stream()
+        return Fen.parse(fen).legalMoves().stream()
                 .map(Move::toString)
                 .toList();
     }
