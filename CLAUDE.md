@@ -51,6 +51,8 @@ then timed games, accounts and friends, and mobile.
 - One GitHub issue per task, in a milestone and as a sub-issue of its version issue. Branch name `<issue-number>-short-name`, PR description says `Closes #<n>`.
 - Commit messages are one short sentence; explanations go in the PR description.
 - Feature branches and pull requests into `main`, reviewed before merging. CI must be green.
+- When starting a task, fetch and update `main` first, then create a new branch from it.
+- After Claude merges a PR, it switches to `main` and deletes that PR's branch. Claude merges only when Serhat asks.
 - Comments and replies Claude posts on GitHub (reviews, replies to review threads, issue comments) start with
   **Claude (AI review):** or **Claude:**, because they appear under Serhat's account. Claude resolves review threads
   only when Serhat asks.
