@@ -33,16 +33,22 @@ See `docs/adr/` for the reasoning behind each choice.
 Read `docs/adr/` before changing the stack or structure. Record new significant decisions there as a new ADR.
 
 ## Roadmap
-Version 1: a solo game (one person moves both sides) in a desktop browser, running locally. Every move is stored,
-games can be resumed via their link, and "Leave game" ends a game. No accounts, no time limit, no mobile layout yet.
+Planning hierarchy: version > milestone > issue. Each version has a version issue (label `version`) that holds its
+goal, scope and "done when" list. Its milestones are named `v<n> · M<n> ...`, and every task issue belongs to one
+milestone and is a sub-issue of its version issue. When a version is done: close its version issue, tag `v<n>.0.0`
+and publish a GitHub Release.
+
+Version 1 ([#63 v1 · Solo game](https://github.com/serhatyenican/chess/issues/63)): a solo game (one person moves both
+sides) in a desktop browser, running locally. Every move is stored, games can be resumed via their link, and
+"Leave game" ends a game. No accounts, no time limit, no mobile layout yet.
 Milestones: v1 · M1 Foundation, v1 · M2 Chess rules, v1 · M3 Game API and storage, v1 · M4 Board in the browser.
-Later versions (planned as labelled issues, not detailed yet): v2 two players via link, v3 bot, then timed games,
-accounts and friends, and mobile.
+Later versions (not detailed yet, each gets its own version issue when planned): v2 two players via link, v3 bot,
+then timed games, accounts and friends, and mobile.
 
 ## Working conventions
 - Small, focused changes with tests.
 - Ask before big design decisions; propose options with trade-offs.
-- One GitHub issue per task. Branch name `<issue-number>-short-name`, PR description says `Closes #<n>`.
+- One GitHub issue per task, in a milestone and as a sub-issue of its version issue. Branch name `<issue-number>-short-name`, PR description says `Closes #<n>`.
 - Commit messages are one short sentence; explanations go in the PR description.
 - Feature branches and pull requests into `main`, reviewed before merging. CI must be green.
 - Prefer the Java Stream API over for-each loops on collections and arrays (filter, map, find, collect).
