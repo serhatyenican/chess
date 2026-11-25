@@ -17,3 +17,4 @@ To start a new one, copy [`template.md`](template.md) and give it the next numbe
 | [0007](0007-testing-strategy.md) | Testing: JUnit + AssertJ, Testcontainers, Vitest | Accepted |
 | [0008](0008-configuration-via-environment.md) | Configuration and secrets via environment variables | Accepted |
 | [0009](0009-single-module-pure-engine-package.md) | Single Gradle module, engine package without Spring | Accepted |
+| [0010](0010-rest-api-design.md) | REST API around resources: plural names, nested moves, PATCH for state changes | Accepted |

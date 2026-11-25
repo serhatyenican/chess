@@ -23,6 +23,8 @@ See `docs/adr/` for the reasoning behind each choice.
   Accounts and login come in a later phase.
 - The server is the authority on chess rules and validates every move.
 - REST endpoints handle the game lifecycle and moves; from v2, WebSockets push moves to the opponent.
+- REST API style (ADR 0010): plural resource nouns (`/api/games`), moves nested under their game
+  (`/api/games/{id}/moves`), state changes via `PATCH` instead of action URLs, UUID game ids, `ProblemDetail` errors.
 - Work is tracked as GitHub issues, one per task, grouped into a milestone per phase.
 - Configuration and secrets come from environment variables. Locally they live in a
   git-ignored `.env` file (template: `.env.example`), read by both docker-compose and Spring Boot.
