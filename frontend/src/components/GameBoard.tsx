@@ -1,6 +1,7 @@
 import { type CSSProperties, useState } from 'react'
 import { Chessboard, type PieceDataType } from 'react-chessboard'
 import type { Game } from '../api/game'
+import { pieceLetter } from '../chess/colors'
 import { kingSquare } from '../chess/kingSquare'
 import { findMove, hasMoves, promotionsFor, targetsFrom } from '../chess/moves'
 import { CHECK_STYLE, SELECTED_STYLE, TARGET_STYLE } from './boardStyles'
@@ -28,7 +29,7 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
 
   const playable = !disabled && game.status === 'IN_PROGRESS'
   // react-chessboard names pieces like "wP" or "bK": the first letter is the color.
-  const sideToMove = game.sideToMove === 'WHITE' ? 'w' : 'b'
+  const sideToMove = pieceLetter(game.sideToMove)
   const isOwnPiece = (piece: PieceDataType | null) => piece?.pieceType.startsWith(sideToMove) ?? false
   // Only a piece of the side to move that has a legal move can be picked up: a blocked or pinned piece can't, and in
   // check only the pieces that can get out of it light up.

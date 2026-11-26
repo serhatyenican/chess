@@ -4,6 +4,7 @@ import { ApiError } from '../api/ApiError'
 import type { Color, Game, GameStatus as Status } from '../api/game'
 import { getGame, playMove } from '../api/games'
 import { capturedPieces } from '../chess/capturedPieces'
+import { colorName } from '../chess/colors'
 import CapturedPieces from '../components/CapturedPieces'
 import GameBoard from '../components/GameBoard'
 import NewGameButton from '../components/NewGameButton'
@@ -17,8 +18,6 @@ type PageState =
   | { kind: 'loaded'; game: Game }
   | { kind: 'notFound' }
   | { kind: 'failed'; message: string }
-
-const COLOR_NAMES: Record<Color, string> = { WHITE: 'White', BLACK: 'Black' }
 
 /**
  * Both mean that there is no game behind the link: 404 for an unknown id, 400 for one that isn't a UUID at all (a
@@ -126,7 +125,7 @@ function GameStatus({ game }: { game: Game }) {
   if (game.status === 'IN_PROGRESS') {
     return (
       <p>
-        {COLOR_NAMES[game.sideToMove]} to move{game.check && <strong> · Check</strong>}
+        {colorName(game.sideToMove)} to move{game.check && <strong> · Check</strong>}
       </p>
     )
   }
@@ -148,7 +147,7 @@ function resultText(status: EndedStatus, winner: Color | null): string {
     case 'CHECKMATE':
       // The server stores a winner exactly for a checkmate (ADR 0011), so a missing one is our own mistake.
       if (!winner) throw new Error('A checkmate without a winner')
-      return `Checkmate. ${COLOR_NAMES[winner]} wins.`
+      return `Checkmate. ${colorName(winner)} wins.`
     case 'STALEMATE':
       return "Stalemate. It's a draw."
     case 'LEFT':
