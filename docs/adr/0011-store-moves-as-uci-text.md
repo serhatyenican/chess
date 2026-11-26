@@ -37,8 +37,12 @@ This replaces the data model in ADR 0005. The rest of ADR 0005 stands.
 - Reading a game needs no replay: the FEN is the position, and the moves are its history.
 - The FEN and the moves must stay consistent. Only the code that plays a move (#61) changes both, in one transaction.
 - Adding a move alone doesn't increase the game's version, because the link to the game is stored in `moves`, not in
-  `games`. Playing a move also changes the FEN, which does. Two requests adding the same move at once are also stopped
-  by the unique `(game_id, ply)`.
+  `games`. Playing a move also changes the FEN, which does.
+- Two checks stop concurrent changes, and which one fires depends on the race. Hibernate runs inserts before updates,
+  so when two moves race, the second insert fails on the unique `(game_id, ply)` before the version is checked. When a
+  move races a change without a new move, such as leaving the game, the version check fails. Both mean that someone
+  else changed the game first, so the API answers 409 for both. Only a violation of `moves_one_per_ply` counts as a
+  conflict: a broken `check` constraint is our own bug and stays a 500.
 - A new status value needs a migration that changes `games_status_known`.
 - Queries about squares, for example for statistics later, need SQL string functions or a later migration that adds
   columns.
