@@ -168,6 +168,7 @@ class PlayMoveApiTests {
             "{\"move\": \"  \"}",
             "{\"move\": null}",
             "{}",
+            "{\"move\": \"e2e4\", \"promotion\": \"q\"}",
             "not json",
             "''",
     })

@@ -21,6 +21,11 @@ spring:
     # Off: no database session for the whole HTTP request. The service maps entities to responses inside its
     # transaction, so a lazy load in the web layer fails loudly instead of quietly running queries.
     open-in-view: false
+  jackson:
+    deserialization:
+      # Spring Boot ignores unknown JSON fields by default. We reject them (400), so a typo or a field the API
+      # doesn't support, such as {"status": "LEFT", "winner": "WHITE"}, isn't silently dropped.
+      fail-on-unknown-properties: true
   mvc:
     # Errors as RFC 9457 problem details, e.g. a malformed id (ADR 0010).
     problemdetails:
