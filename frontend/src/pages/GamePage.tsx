@@ -85,22 +85,30 @@ function GameContent({ state }: { state: PageState }) {
 function LoadedGame({ initialGame }: { initialGame: Game }) {
   const [game, setGame] = useState(initialGame)
   const [sending, setSending] = useState(false)
-  const [moveError, setMoveError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  async function handleMove(move: string) {
+  /**
+   * Sends a change of the game to the server and shows the game it answers with. While it runs, the board takes no
+   * moves. If the server rejects it because its game differs from ours (409, 422), e.g. because the same game was
+   * moved in another tab, the message is shown and the game is loaded again.
+   */
+  async function sendChange(request: () => Promise<Game>) {
     setSending(true)
-    setMoveError(null)
+    setError(null)
     try {
-      setGame(await playMove(game.id, move))
+      setGame(await request())
     } catch (e) {
-      setMoveError(messageOf(e))
-      // The server's game differs from ours, e.g. because the same game was moved in another tab: load it again.
+      setError(messageOf(e))
       if (e instanceof ApiError && (e.status === 409 || e.status === 422)) {
-        await getGame(game.id).then(setGame, (reloadError: unknown) => setMoveError(messageOf(reloadError)))
+        await getGame(game.id).then(setGame, (reloadError: unknown) => setError(messageOf(reloadError)))
       }
     } finally {
       setSending(false)
     }
+  }
+
+  function handleMove(move: string) {
+    return sendChange(() => playMove(game.id, move))
   }
 
   const captured = capturedPieces(game.fen)
@@ -109,7 +117,7 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
   return (
     <>
       <GameStatus game={game} />
-      {moveError && <p role="alert">{moveError}</p>}
+      {error && <p role="alert">{error}</p>}
       <CapturedPieces by="BLACK" captures={captured.BLACK} lead={captured.BLACK.points - captured.WHITE.points} />
       <GameBoard game={game} onMove={handleMove} disabled={sending} />
       <CapturedPieces by="WHITE" captures={captured.WHITE} lead={captured.WHITE.points - captured.BLACK.points} />
