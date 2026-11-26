@@ -42,7 +42,7 @@ class GameService {
 
     /**
      * Plays a move in the game with this id and stores it. The game is flushed here, so a conflict with another
-     * request shows up in this method rather than at commit, and the response has the new version.
+     * request fails inside this method rather than at commit, after the method has returned.
      *
      * @param text the move in UCI notation, e.g. {@code "e7e8q"}
      * @throws GameNotFoundException if there is no such game
