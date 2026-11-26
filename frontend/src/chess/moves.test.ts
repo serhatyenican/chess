@@ -58,6 +58,10 @@ describe('promotionsFor', () => {
     expect(promotionsFor(PROMOTIONS, 'e7', 'e8')).toEqual(['q', 'r', 'b', 'n'])
   })
 
+  it('keeps the order queen, rook, bishop, knight, whatever order the server lists them in', () => {
+    expect(promotionsFor(['e7e8n', 'e7e8b', 'e7e8q', 'e7e8r'], 'e7', 'e8')).toEqual(['q', 'r', 'b', 'n'])
+  })
+
   it('works for a capture that promotes', () => {
     expect(promotionsFor(PROMOTIONS, 'e7', 'd8')).toEqual(['q', 'r', 'b', 'n'])
   })
