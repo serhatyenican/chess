@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { findMove, hasMoves, targetsFrom } from './moves'
+import { findMove, hasMoves, promotionsFor, targetsFrom } from './moves'
 
 const START = ['b1a3', 'b1c3', 'g1f3', 'g1h3', 'e2e3', 'e2e4', 'd2d3', 'd2d4']
+
+// A white pawn on e7 that can move to e8 or capture on d8, both promoting.
+const PROMOTIONS = ['e7e8q', 'e7e8r', 'e7e8b', 'e7e8n', 'e7d8q', 'e7d8r', 'e7d8b', 'e7d8n', 'e1d1']
 
 describe('hasMoves', () => {
   it('is true for a piece with a legal move', () => {
@@ -30,8 +33,8 @@ describe('targetsFrom', () => {
     expect(targetsFrom(START, 'e5')).toEqual([])
   })
 
-  it('leaves out promotions for now', () => {
-    expect(targetsFrom(['e7e8q', 'e7e8r', 'e7e8b', 'e7e8n', 'e7d8q', 'a2a3'], 'e7')).toEqual([])
+  it('lists a promotion square once', () => {
+    expect(targetsFrom(PROMOTIONS, 'e7')).toEqual(['e8', 'd8'])
   })
 })
 
@@ -45,7 +48,22 @@ describe('findMove', () => {
     expect(findMove(START, 'e4', 'e2')).toBeUndefined()
   })
 
-  it('finds no promotion for now', () => {
-    expect(findMove(['e7e8q', 'e7e8n'], 'e7', 'e8')).toBeUndefined()
+  it('finds no promotion, since it needs the piece', () => {
+    expect(findMove(PROMOTIONS, 'e7', 'e8')).toBeUndefined()
+  })
+})
+
+describe('promotionsFor', () => {
+  it('lists the pieces a pawn can become', () => {
+    expect(promotionsFor(PROMOTIONS, 'e7', 'e8')).toEqual(['q', 'r', 'b', 'n'])
+  })
+
+  it('works for a capture that promotes', () => {
+    expect(promotionsFor(PROMOTIONS, 'e7', 'd8')).toEqual(['q', 'r', 'b', 'n'])
+  })
+
+  it('is empty for a move that is no promotion', () => {
+    expect(promotionsFor(PROMOTIONS, 'e1', 'd1')).toEqual([])
+    expect(promotionsFor(START, 'e2', 'e4')).toEqual([])
   })
 })

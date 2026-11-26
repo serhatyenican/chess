@@ -31,3 +31,10 @@ export const GAME_AFTER_E4: Game = {
   sideToMove: 'BLACK',
   legalMoves: ['e7e5', 'e7e6', 'g8f6', 'b8c6'],
 }
+
+/** A white pawn on e7 that promotes by moving to e8 or by capturing the black rook on d8. */
+export const GAME_BEFORE_PROMOTION: Game = {
+  ...NEW_GAME,
+  fen: '3r3k/4P3/8/8/8/8/8/4K3 w - - 0 1',
+  legalMoves: ['e7e8q', 'e7e8r', 'e7e8b', 'e7e8n', 'e7d8q', 'e7d8r', 'e7d8b', 'e7d8n', 'e1d1', 'e1d2', 'e1e2'],
+}
