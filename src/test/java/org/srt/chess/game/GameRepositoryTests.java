@@ -127,8 +127,8 @@ class GameRepositoryTests {
         game.play(Move.of("e2e4"));
         assertThatThrownBy(() -> gameRepository.saveAndFlush(game))
                 .isInstanceOfSatisfying(DataIntegrityViolationException.class, exception ->
-                        assertThat(GameExceptionHandler.violates(exception, GameExceptionHandler.ONE_MOVE_PER_PLY))
-                                .as("recognized as a race by the exception handler")
+                        assertThat(GameService.violates(exception, GameService.ONE_MOVE_PER_PLY))
+                                .as("recognized as a race by the service")
                                 .isTrue());
     }
 

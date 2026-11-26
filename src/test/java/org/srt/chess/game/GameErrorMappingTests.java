@@ -19,9 +19,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 /**
- * Checks how {@link GameExceptionHandler} answers errors that a real race between two requests would cause. A race
- * over HTTP depends on timing, so here the service is a mock that throws the errors directly. That the database
- * really raises them is shown in {@link GameRepositoryTests}.
+ * Checks how {@link GameExceptionHandler} answers a race between two requests, which can't be caused reliably over
+ * real HTTP. The service is a mock that throws directly; {@link GameServiceTests} shows when the real service throws
+ * {@link ConcurrentChangeException}.
  * <p>
  * {@code @WebMvcTest} starts only the web layer: the controller and the exception handler, without a database.
  */
@@ -37,26 +37,24 @@ class GameErrorMappingTests {
     GameService gameService;
 
     @Test
-    void answersTwoMovesRacingEachOtherWithConflict() {
-        given(gameService.play(any(), anyString())).willThrow(violationOf(GameExceptionHandler.ONE_MOVE_PER_PLY));
+    void answersAConcurrentChangeWithConflict() {
+        given(gameService.play(any(), anyString()))
+                .willThrow(new ConcurrentChangeException(new ObjectOptimisticLockingFailureException(Game.class, ID)));
 
         assertThat(playMove())
                 .hasStatus(409)
-                .bodyJson().extractingPath("$.detail")
-                .isEqualTo("The game was changed by another request. Load it again and retry.");
+                .bodyJson().satisfies(body -> {
+                    assertThat(body).extractingPath("$.title").isEqualTo("Conflict");
+                    assertThat(body).extractingPath("$.detail")
+                            .isEqualTo("The game was changed by another request. Load it again and retry.");
+                });
     }
 
     @Test
-    void answersAMoveRacingAnotherChangeWithConflict() {
-        given(gameService.play(any(), anyString()))
-                .willThrow(new ObjectOptimisticLockingFailureException(Game.class, ID));
-
-        assertThat(playMove()).hasStatus(409);
-    }
-
-    @Test
-    void leavesAnyOtherConstraintViolationAnInternalError() {
-        DataIntegrityViolationException violation = violationOf("games_winner_only_on_checkmate");
+    void leavesAnExceptionThatIsNotAGameExceptionAnInternalError() {
+        DataIntegrityViolationException violation = new DataIntegrityViolationException("could not execute statement",
+                new ConstraintViolationException("constraint violated", new SQLException(),
+                        "games_winner_only_on_checkmate"));
         given(gameService.play(any(), anyString())).willThrow(violation);
 
         // Without a servlet container, an unhandled exception reaches the test, wrapped by the dispatcher servlet,
@@ -68,10 +66,5 @@ class GameErrorMappingTests {
         return mvc.post().uri("/api/games/{id}/moves", ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"move\": \"e2e4\"}");
-    }
-
-    private static DataIntegrityViolationException violationOf(String constraint) {
-        return new DataIntegrityViolationException("could not execute statement",
-                new ConstraintViolationException("duplicate key", new SQLException(), constraint));
     }
 }
