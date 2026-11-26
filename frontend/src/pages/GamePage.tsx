@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ApiError } from '../api/ApiError'
 import type { Color, Game } from '../api/game'
-import { getGame } from '../api/games'
+import { getGame, playMove } from '../api/games'
 import GameBoard from '../components/GameBoard'
 
 /**
@@ -72,13 +72,42 @@ function GameContent({ state }: { state: PageState }) {
     case 'failed':
       return <p role="alert">{state.message}</p>
     case 'loaded':
-      return (
-        <>
-          <GameStatus game={state.game} />
-          <GameBoard game={state.game} />
-        </>
-      )
+      return <LoadedGame initialGame={state.game} />
   }
+}
+
+/**
+ * A loaded game that is being played. It owns the game from here on: each move goes to the server, and the board
+ * then shows the game the server answers with.
+ */
+function LoadedGame({ initialGame }: { initialGame: Game }) {
+  const [game, setGame] = useState(initialGame)
+  const [sending, setSending] = useState(false)
+  const [moveError, setMoveError] = useState<string | null>(null)
+
+  async function handleMove(move: string) {
+    setSending(true)
+    setMoveError(null)
+    try {
+      setGame(await playMove(game.id, move))
+    } catch (e) {
+      setMoveError(messageOf(e))
+      // The server's game differs from ours, e.g. because the same game was moved in another tab: load it again.
+      if (e instanceof ApiError && (e.status === 409 || e.status === 422)) {
+        await getGame(game.id).then(setGame, (reloadError: unknown) => setMoveError(messageOf(reloadError)))
+      }
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <>
+      <GameStatus game={game} />
+      {moveError && <p role="alert">{moveError}</p>}
+      <GameBoard game={game} onMove={handleMove} disabled={sending} />
+    </>
+  )
 }
 
 /** Whose turn it is, and whether that side is in check. How a game ended is shown from #89. */
@@ -94,12 +123,20 @@ function GameStatus({ game }: { game: Game }) {
 }
 
 function failedState(e: unknown): PageState {
+  if (e instanceof ApiError && NOT_FOUND_STATUSES.includes(e.status)) {
+    return { kind: 'notFound' }
+  }
+  return { kind: 'failed', message: messageOf(e) }
+}
+
+/** The text to show for an error: the server's own text for an API error, a general one for anything else. */
+function messageOf(e: unknown): string {
   if (e instanceof ApiError) {
-    return NOT_FOUND_STATUSES.includes(e.status) ? { kind: 'notFound' } : { kind: 'failed', message: e.detail }
+    return e.detail
   }
   // Not an API error, so a bug in our own code: keep the stack trace in the browser console.
   console.error(e)
-  return { kind: 'failed', message: 'Something went wrong. Please try again.' }
+  return 'Something went wrong. Please try again.'
 }
 
 export default GamePage

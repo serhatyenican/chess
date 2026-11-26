@@ -2,6 +2,8 @@ import { screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../api/ApiError'
 import { getGame } from '../api/games'
+import { CHECK_STYLE } from '../components/boardStyles'
+import { hasMark, pieceOn } from '../test/board'
 import { GAME_IN_CHECK, NEW_GAME } from '../test/games'
 import { renderAt } from '../test/renderAt'
 
@@ -11,18 +13,6 @@ afterEach(() => {
   vi.resetAllMocks()
   vi.restoreAllMocks()
 })
-
-/** The square of the board, found by the data-square attribute react-chessboard gives it. */
-function square(name: string): HTMLElement {
-  const element = document.querySelector<HTMLElement>(`[data-square="${name}"]`)
-  if (!element) throw new Error(`No square ${name} on the page`)
-  return element
-}
-
-/** Whether the square shows the check highlight. react-chessboard puts square styles on an overlay inside it. */
-function isHighlighted(name: string): boolean {
-  return square(name).querySelector('[style*="radial-gradient"]') !== null
-}
 
 describe('GamePage', () => {
   it('loads the game of the link', async () => {
@@ -41,9 +31,9 @@ describe('GamePage', () => {
     renderAt(`/games/${NEW_GAME.id}`)
 
     await screen.findByText('White to move')
-    expect(square('e1').querySelector('[data-piece="wK"]')).not.toBeNull()
-    expect(square('e8').querySelector('[data-piece="bK"]')).not.toBeNull()
-    expect(square('e4').querySelector('[data-piece]')).toBeNull()
+    expect(pieceOn('e1')).toBe('wK')
+    expect(pieceOn('e8')).toBe('bK')
+    expect(pieceOn('e4')).toBeNull()
   })
 
   it('shows check and highlights the king of the side to move', async () => {
@@ -53,8 +43,8 @@ describe('GamePage', () => {
 
     const status = await screen.findByText(/Black to move/)
     expect(within(status).getByText(/Check/)).toBeInTheDocument()
-    expect(isHighlighted('e8')).toBe(true)
-    expect(isHighlighted('e1')).toBe(false)
+    expect(hasMark('e8', CHECK_STYLE)).toBe(true)
+    expect(hasMark('e1', CHECK_STYLE)).toBe(false)
   })
 
   it('shows no check when the side to move is not in check', async () => {
@@ -64,7 +54,7 @@ describe('GamePage', () => {
 
     await screen.findByText('White to move')
     expect(screen.queryByText(/Check/)).not.toBeInTheDocument()
-    expect(isHighlighted('e1')).toBe(false)
+    expect(hasMark('e1', CHECK_STYLE)).toBe(false)
   })
 
   // What the backend answers (checked with curl): 400 for an id that isn't a UUID, 404 for an unknown UUID.
