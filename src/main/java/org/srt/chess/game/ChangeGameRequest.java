@@ -1,5 +1,6 @@
 package org.srt.chess.game;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -8,5 +9,7 @@ import jakarta.validation.constraints.NotNull;
  *
  * @param status the new status; only {@code LEFT} is allowed
  */
-record ChangeGameRequest(@NotNull GameStatus status) {
+record ChangeGameRequest(
+        // The type allows every status, but only LEFT is accepted, so the spec lists only that one.
+        @Schema(allowableValues = "LEFT") @NotNull GameStatus status) {
 }

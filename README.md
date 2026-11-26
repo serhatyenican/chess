@@ -22,6 +22,8 @@ docker compose up -d          # starts Postgres
 ./gradlew bootRun             # starts the app on http://localhost:8080
 ```
 
+The API documentation is at http://localhost:8080/swagger-ui.html, where you can also try the calls.
+
 Run the tests with `./gradlew test`. Tests start their own throwaway Postgres with
 [Testcontainers](https://testcontainers.com), so they only need Docker running, not the `.env` database.
 
