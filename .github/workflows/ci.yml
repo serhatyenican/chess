@@ -12,10 +12,41 @@ concurrency:
 
 permissions:
   contents: read
+  # The path filter reads a pull request's changed files through the GitHub API.
+  pull-requests: read
 
 jobs:
+  # Decides whether the build is needed. "Build and test" is a required check on main, so the workflow must always
+  # start: with paths-ignore on the trigger, a docs-only PR would wait forever for the check. A job skipped by its
+  # `if`, however, counts as passed.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      # Needed for pushes, where the filter compares commits. For pull requests it uses the API.
+      - uses: actions/checkout@v7
+
+      - id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          # A file counts as code only if it matches all patterns: anything except Markdown files and docs/.
+          # So the workflow files count as code too.
+          predicate-quantifier: every
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+
   build:
+    # The required check has this name: keep it.
     name: Build and test
+    needs: changes
+    # Pushes to main always build, as a safety net.
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
