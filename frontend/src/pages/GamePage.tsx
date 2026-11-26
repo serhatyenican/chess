@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ApiError } from '../api/ApiError'
 import type { Color, Game, GameStatus as Status } from '../api/game'
-import { getGame, playMove } from '../api/games'
+import { getGame, leaveGame, playMove } from '../api/games'
 import { capturedPieces } from '../chess/capturedPieces'
 import { colorName } from '../chess/colors'
 import CapturedPieces from '../components/CapturedPieces'
+import ConfirmDialog from '../components/ConfirmDialog'
 import GameBoard from '../components/GameBoard'
 import NewGameButton from '../components/NewGameButton'
 
@@ -86,6 +87,8 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
   const [game, setGame] = useState(initialGame)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // True while "Leave this game?" is being asked.
+  const [confirmingLeave, setConfirmingLeave] = useState(false)
 
   /**
    * Sends a change of the game to the server and shows the game it answers with. While it runs, the board takes no
@@ -111,6 +114,11 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
     return sendChange(() => playMove(game.id, move))
   }
 
+  function handleLeave() {
+    setConfirmingLeave(false)
+    return sendChange(() => leaveGame(game.id))
+  }
+
   const captured = capturedPieces(game.fen)
 
   // Each side's captures next to its own side of the board: Black's above, White's below (White is at the bottom).
@@ -121,6 +129,23 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
       <CapturedPieces by="BLACK" captures={captured.BLACK} lead={captured.BLACK.points - captured.WHITE.points} />
       <GameBoard game={game} onMove={handleMove} disabled={sending} />
       <CapturedPieces by="WHITE" captures={captured.WHITE} lead={captured.WHITE.points - captured.BLACK.points} />
+      {/* Once the game has ended, "New game" next to the result takes this button's place. */}
+      {game.status === 'IN_PROGRESS' && (
+        <p>
+          <button type="button" onClick={() => setConfirmingLeave(true)} disabled={sending}>
+            Leave game
+          </button>
+        </p>
+      )}
+      {confirmingLeave && (
+        <ConfirmDialog
+          title="Leave this game?"
+          message="The game ends here and can't be continued. Its link still shows the final position."
+          confirmLabel="Leave game"
+          onConfirm={handleLeave}
+          onCancel={() => setConfirmingLeave(false)}
+        />
+      )}
     </>
   )
 }
