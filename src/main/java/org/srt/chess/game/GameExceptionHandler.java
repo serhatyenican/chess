@@ -47,16 +47,16 @@ class GameExceptionHandler {
         return problem(HttpStatus.UNPROCESSABLE_CONTENT, exception.title(), exception.getMessage());
     }
 
+    @ExceptionHandler
+    ProblemDetail gameOver(GameOverException exception) {
+        return problem(HttpStatus.CONFLICT, "Game over", exception.getMessage());
+    }
+
     /**
-     * The game can't be changed: it has already ended, or another request changed it first. The second is a move
-     * racing a change without a new move, such as leaving the game, where the version check fails (ADR 0011). That
-     * exception is Spring's, so it has no title of its own.
+     * A move racing a change without a new move, such as leaving the game: the version check fails (ADR 0011).
      */
-    @ExceptionHandler({GameOverException.class, ObjectOptimisticLockingFailureException.class})
-    ProblemDetail conflict(RuntimeException exception) {
-        if (exception instanceof GameOverException gameOver) {
-            return problem(HttpStatus.CONFLICT, gameOver.title(), gameOver.getMessage());
-        }
+    @ExceptionHandler
+    ProblemDetail changedByAnotherRequest(ObjectOptimisticLockingFailureException exception) {
         return problem(HttpStatus.CONFLICT, "Conflict", CHANGED_BY_ANOTHER_REQUEST);
     }
 
