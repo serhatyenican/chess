@@ -16,8 +16,9 @@ type GameBoardProps = {
 
 /**
  * Draws the game's position, White at the bottom, since one person plays both sides (v1). A move is made by
- * dragging a piece, or by clicking it and then a target square. A pawn reaching the last rank first asks for the piece. The board only reports the move: the page sends it,
- * and the board then shows the position the server answers with (ADR 0006).
+ * dragging a piece, or by clicking it and then a target square; a pawn reaching the last rank first asks for the
+ * piece. The board only reports the move: the page sends it, and the board then shows the position the server
+ * answers with (ADR 0006).
  */
 function GameBoard({ game, onMove, disabled }: GameBoardProps) {
   // The square of the selected piece. Only the board cares about it, so it is the board's own state.
