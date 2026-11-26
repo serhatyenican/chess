@@ -1,6 +1,6 @@
 # 0005. PostgreSQL with JPA and Flyway, games and moves tables
 
-- Status: Accepted
+- Status: Accepted; the data model is replaced by [0011](0011-store-moves-as-uci-text.md)
 - Date: 2026-11-22
 
 ## Context
