@@ -68,11 +68,11 @@ class GameController {
      * <p>
      * Although {@code PATCH} looks like a generic update, only one change is allowed: leaving a game in progress with
      * {@code {"status": "LEFT"}} (ADR 0010). The game then has no winner and no legal moves, and its link still
-     * shows it.
+     * shows it. The errors are checked in this order, first the request and then the game:
      * <ul>
      *   <li>400: a missing or unknown status, or any other field in the body</li>
-     *   <li>404: no game with this id</li>
      *   <li>422: any other status, such as {@code CHECKMATE}, since the other endings come from playing moves</li>
+     *   <li>404: no game with this id</li>
      *   <li>409: the game has already ended</li>
      * </ul>
      */

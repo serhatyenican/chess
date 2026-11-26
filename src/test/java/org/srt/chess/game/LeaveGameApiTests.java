@@ -134,6 +134,12 @@ class LeaveGameApiTests {
     }
 
     @Test
+    void rejectsAnotherStatusEvenForAnUnknownGame() {
+        // The status is checked before the game is loaded, so that error wins over "no such game".
+        patch(UUID.randomUUID(), "{\"status\": \"CHECKMATE\"}").expectStatus().isEqualTo(422);
+    }
+
+    @Test
     void answersLeavingAnUnknownGameWithNotFound() {
         UUID id = UUID.randomUUID();
 

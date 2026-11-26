@@ -59,16 +59,19 @@ class GameService {
     /**
      * Changes the status of the game with this id. The only change allowed is leaving: {@code IN_PROGRESS} to
      * {@code LEFT}. The other endings come from playing moves.
+     * <p>
+     * The requested status is checked before the game is loaded: a status other than {@code LEFT} is wrong for any
+     * game, so it needs no database query.
      *
-     * @throws GameNotFoundException           if there is no such game
      * @throws StatusChangeNotAllowedException if the requested status is not {@code LEFT}
+     * @throws GameNotFoundException           if there is no such game
      * @throws GameOverException               if the game has already ended
      */
     GameResponse changeStatus(UUID id, GameStatus requested) {
-        Game game = find(id);
         if (requested != GameStatus.LEFT) {
             throw new StatusChangeNotAllowedException(requested);
         }
+        Game game = find(id);
         game.leave();
         return GameResponse.of(gameRepository.saveAndFlush(game));
     }
