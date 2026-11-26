@@ -39,26 +39,24 @@ class GameExceptionHandler {
         return problem(HttpStatus.BAD_REQUEST, "Invalid move", exception.getMessage());
     }
 
-    @ExceptionHandler
-    ProblemDetail illegalMove(IllegalMoveException exception) {
-        return problem(HttpStatus.UNPROCESSABLE_CONTENT, "Illegal move", exception.getMessage());
-    }
-
-    @ExceptionHandler
-    ProblemDetail statusChangeNotAllowed(StatusChangeNotAllowedException exception) {
-        return problem(HttpStatus.UNPROCESSABLE_CONTENT, "Status change not allowed", exception.getMessage());
-    }
-
-    @ExceptionHandler
-    ProblemDetail gameOver(GameOverException exception) {
-        return problem(HttpStatus.CONFLICT, "Game over", exception.getMessage());
+    /**
+     * A well-formed request that the rules don't allow: an illegal move, or a status other than {@code LEFT}.
+     */
+    @ExceptionHandler({IllegalMoveException.class, StatusChangeNotAllowedException.class})
+    ProblemDetail unprocessable(TitledException exception) {
+        return problem(HttpStatus.UNPROCESSABLE_CONTENT, exception.title(), exception.getMessage());
     }
 
     /**
-     * A move racing a change without a new move, such as leaving the game: the version check fails (ADR 0011).
+     * The game can't be changed: it has already ended, or another request changed it first. The second is a move
+     * racing a change without a new move, such as leaving the game, where the version check fails (ADR 0011). That
+     * exception is Spring's, so it has no title of its own.
      */
-    @ExceptionHandler
-    ProblemDetail changedByAnotherRequest(ObjectOptimisticLockingFailureException exception) {
+    @ExceptionHandler({GameOverException.class, ObjectOptimisticLockingFailureException.class})
+    ProblemDetail conflict(RuntimeException exception) {
+        if (exception instanceof GameOverException gameOver) {
+            return problem(HttpStatus.CONFLICT, gameOver.title(), gameOver.getMessage());
+        }
         return problem(HttpStatus.CONFLICT, "Conflict", CHANGED_BY_ANOTHER_REQUEST);
     }
 
