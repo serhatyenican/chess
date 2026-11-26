@@ -1,5 +1,5 @@
 import { ApiError } from './ApiError'
-import type { Game } from './game'
+import type { ChangeGameRequest, Game, PlayMoveRequest } from './game'
 
 // The client for the game endpoints (ADR 0010). Components call these functions and never `fetch` itself.
 // Every function resolves to the game as the server now has it, or rejects with an ApiError.
@@ -16,12 +16,12 @@ export function getGame(id: string): Promise<Game> {
 
 /** Plays a move in UCI notation, e.g. "e2e4" or "e7e8q": `POST /api/games/{id}/moves`. */
 export function playMove(id: string, move: string): Promise<Game> {
-  return request(`${gamePath(id)}/moves`, jsonBody('POST', { move }))
+  return request(`${gamePath(id)}/moves`, jsonBody('POST', { move } satisfies PlayMoveRequest))
 }
 
 /** Leaves a game in progress: `PATCH /api/games/{id}` with status LEFT. */
 export function leaveGame(id: string): Promise<Game> {
-  return request(gamePath(id), jsonBody('PATCH', { status: 'LEFT' }))
+  return request(gamePath(id), jsonBody('PATCH', { status: 'LEFT' } satisfies ChangeGameRequest))
 }
 
 // The id comes from the page's URL, so it is encoded: a stray "/" or "?" can't change which endpoint is called.

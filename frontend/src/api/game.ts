@@ -9,3 +9,9 @@ export type Game = components['schemas']['GameResponse']
 export type Color = Game['sideToMove']
 
 export type GameStatus = Game['status']
+
+// The request bodies. games.ts checks its bodies against these with `satisfies`, so a renamed field fails the build.
+
+export type PlayMoveRequest = components['schemas']['PlayMoveRequest']
+
+export type ChangeGameRequest = components['schemas']['ChangeGameRequest']
