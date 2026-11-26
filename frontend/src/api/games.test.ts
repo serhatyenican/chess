@@ -108,13 +108,30 @@ describe('errors', () => {
   })
 
   it('an error answer without a problem detail still gives its status', async () => {
-    fetchMock.mockResolvedValue(new Response('Bad Gateway', { status: 502, statusText: 'Bad Gateway' }))
+    fetchMock.mockResolvedValue(new Response('Oops', { status: 500, statusText: 'Internal Server Error' }))
 
     await expect(getGame(ID)).rejects.toMatchObject({
-      status: 502,
-      title: 'Bad Gateway',
-      detail: 'The server answered with status 502.',
+      status: 500,
+      title: 'Internal Server Error',
+      detail: 'The server answered with status 500.',
     })
+  })
+
+  // What Vite's dev server answers when Spring isn't running.
+  it.each([502, 503, 504])('a %i without a problem detail means the server is unreachable', async (status) => {
+    fetchMock.mockResolvedValue(new Response('', { status, headers: { 'Content-Type': 'text/plain' } }))
+
+    await expect(getGame(ID)).rejects.toMatchObject({
+      status,
+      title: 'Network error',
+      detail: 'Could not reach the server. Check that it is running.',
+    })
+  })
+
+  it('a gateway status with a problem detail keeps the server\'s text', async () => {
+    problem(503, 'Service Unavailable', 'Down for maintenance')
+
+    await expect(getGame(ID)).rejects.toMatchObject({ status: 503, title: 'Service Unavailable' })
   })
 
   it('a network failure becomes an ApiError without a status', async () => {
