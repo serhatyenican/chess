@@ -64,16 +64,31 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         GameResponse: {
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description The game's id, also the last part of its URL
+             */
             id: string;
+            /** @description The current position in FEN */
             fen: string;
-            /** @enum {string} */
+            /**
+             * @description Whose turn it is, read from the FEN
+             * @enum {string}
+             */
             sideToMove: "WHITE" | "BLACK";
+            /** @description Whether the side to move is in check */
             check: boolean;
-            /** @enum {string} */
+            /**
+             * @description Whether the game goes on, and if not, how it ended
+             * @enum {string}
+             */
             status: "IN_PROGRESS" | "CHECKMATE" | "STALEMATE" | "LEFT";
-            /** @enum {string|null} */
+            /**
+             * @description The winner of a checkmate, otherwise null
+             * @enum {string|null}
+             */
             winner: "WHITE" | "BLACK" | null;
+            /** @description The moves the side to move can play, in UCI notation such as "e7e8q", so the board needs no copy of the rules; empty once the game has ended */
             legalMoves: string[];
         };
         PlayMoveRequest: {
