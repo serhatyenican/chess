@@ -1,13 +1,23 @@
-import { screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../api/ApiError'
 import type { Game } from '../api/game'
-import { startGame } from '../api/games'
+import { getGame, startGame } from '../api/games'
 import { NEW_GAME as GAME } from '../test/games'
 import { renderAt } from '../test/renderAt'
 
 // Replaces every function of the API module with a mock, like @MockitoBean in a Spring test.
 vi.mock('../api/games')
+
+beforeEach(() => {
+  // The game page loads the game after the navigation; it stays loading, since these tests are about the start page.
+  vi.mocked(getGame).mockReturnValue(new Promise(() => {}))
+})
+
+/** Waits until the app has navigated to this game's page, which then asks for that game. */
+async function expectGamePageOf(id: string) {
+  await waitFor(() => expect(getGame).toHaveBeenCalledWith(id))
+}
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -23,7 +33,7 @@ describe('StartPage', () => {
     await user.click(screen.getByRole('button', { name: 'New game' }))
 
     expect(startGame).toHaveBeenCalledOnce()
-    expect(await screen.findByText(`Game ${GAME.id}`)).toBeInTheDocument()
+    await expectGamePageOf(GAME.id)
   })
 
   it('disables the button while the game is being started', async () => {
@@ -38,7 +48,7 @@ describe('StartPage', () => {
 
     resolve(GAME)
 
-    expect(await screen.findByText(`Game ${GAME.id}`)).toBeInTheDocument()
+    await expectGamePageOf(GAME.id)
   })
 
   it('shows the error and lets you try again when starting fails', async () => {
@@ -53,7 +63,7 @@ describe('StartPage', () => {
     vi.mocked(startGame).mockResolvedValueOnce(GAME)
     await user.click(screen.getByRole('button', { name: 'New game' }))
 
-    expect(await screen.findByText(`Game ${GAME.id}`)).toBeInTheDocument()
+    await expectGamePageOf(GAME.id)
     expect(startGame).toHaveBeenCalledTimes(2)
   })
 
