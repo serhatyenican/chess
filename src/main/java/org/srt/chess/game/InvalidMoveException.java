@@ -5,7 +5,7 @@ package org.srt.chess.game;
  * {@link org.srt.chess.engine.Move#of(String)}, which names the text and what is wrong. {@link GameExceptionHandler}
  * turns it into a 400.
  */
-class InvalidMoveException extends RuntimeException {
+final class InvalidMoveException extends GameException {
 
     InvalidMoveException(IllegalArgumentException cause) {
         super(cause.getMessage(), cause);
