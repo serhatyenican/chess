@@ -54,8 +54,8 @@ then timed games, accounts and friends, and mobile.
 - When starting a task, fetch and update `main` first, then create a new branch from it.
 - After Claude merges a PR, it switches to `main` and deletes that PR's branch. Claude merges only when Serhat asks.
 - Comments and replies Claude posts on GitHub (reviews, replies to review threads, issue comments) start with
-  **Claude (AI review):** or **Claude:**, because they appear under Serhat's account. Claude resolves review threads
-  only when Serhat asks.
+  **Claude (AI review):** or **Claude:**, because they appear under Serhat's account. Claude resolves a review thread
+  after replying to it, unless the reply disagrees or asks Serhat a question.
 - Prefer the Java Stream API over for-each loops on collections and arrays (filter, map, find, collect).
   Index-based `for` loops (e.g. over ranks and files) are fine, and so is a for-each loop that carries state
   between iterations.
