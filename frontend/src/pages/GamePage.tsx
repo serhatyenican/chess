@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ApiError } from '../api/ApiError'
-import type { Color, Game } from '../api/game'
+import type { Color, Game, GameStatus as Status } from '../api/game'
 import { getGame, playMove } from '../api/games'
 import GameBoard from '../components/GameBoard'
+import NewGameButton from '../components/NewGameButton'
 
 /**
  * What the page shows. One type with a case per situation, so impossible mixes such as "loading, but with an error"
@@ -110,16 +111,48 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
   )
 }
 
-/** Whose turn it is, and whether that side is in check. How a game ended is shown from #89. */
+/**
+ * While the game goes on: whose turn it is, and whether that side is in check. Once it has ended: the result, and
+ * "New game". The board is locked by then, since a finished game has no legal moves.
+ */
 function GameStatus({ game }: { game: Game }) {
-  if (game.status !== 'IN_PROGRESS') {
-    return null
+  if (game.status === 'IN_PROGRESS') {
+    return (
+      <p>
+        {COLOR_NAMES[game.sideToMove]} to move{game.check && <strong> · Check</strong>}
+      </p>
+    )
   }
   return (
-    <p>
-      {COLOR_NAMES[game.sideToMove]} to move{game.check && <strong> · Check</strong>}
-    </p>
+    <div>
+      <p role="status">
+        <strong>{resultText(game.status, game.winner)}</strong>
+      </p>
+      <NewGameButton />
+    </div>
   )
+}
+
+/** The ways a game can end: every status except IN_PROGRESS. */
+type EndedStatus = Exclude<Status, 'IN_PROGRESS'>
+
+function resultText(status: EndedStatus, winner: Color | null): string {
+  switch (status) {
+    case 'CHECKMATE':
+      // The server stores a winner exactly for a checkmate (ADR 0011), so a missing one is our own mistake.
+      if (!winner) throw new Error('A checkmate without a winner')
+      return `Checkmate. ${COLOR_NAMES[winner]} wins.`
+    case 'STALEMATE':
+      return "Stalemate. It's a draw."
+    case 'LEFT':
+      return 'This game was left.'
+    default: {
+      // Only compiles while every status above is handled: a new one in the API (via `npm run api:types`) makes the
+      // build fail here, like a Java switch over an enum without a default.
+      const unhandled: never = status
+      throw new Error(`Unknown game status ${String(unhandled)}`)
+    }
+  }
 }
 
 function failedState(e: unknown): PageState {
