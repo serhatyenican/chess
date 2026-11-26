@@ -38,3 +38,26 @@ export const GAME_BEFORE_PROMOTION: Game = {
   fen: '3r3k/4P3/8/8/8/8/8/4K3 w - - 0 1',
   legalMoves: ['e7e8q', 'e7e8r', 'e7e8b', 'e7e8n', 'e7d8q', 'e7d8r', 'e7d8b', 'e7d8n', 'e1d1', 'e1d2', 'e1e2'],
 }
+
+/** After the fool's mate (f2f3 e7e5 g2g4 d8h4), as the API answered it: Black has won. */
+export const GAME_CHECKMATE: Game = {
+  ...NEW_GAME,
+  fen: 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3',
+  sideToMove: 'WHITE',
+  check: true,
+  status: 'CHECKMATE',
+  winner: 'BLACK',
+  legalMoves: [],
+}
+
+/** Black to move with the king on h8, not in check, but every square around it covered: a draw. */
+export const GAME_STALEMATE: Game = {
+  ...NEW_GAME,
+  fen: '7k/5Q2/6K1/8/8/8/8/8 b - - 0 1',
+  sideToMove: 'BLACK',
+  status: 'STALEMATE',
+  legalMoves: [],
+}
+
+/** A game that was left right at the start, as the API answers it. */
+export const GAME_LEFT: Game = { ...NEW_GAME, status: 'LEFT', legalMoves: [] }
