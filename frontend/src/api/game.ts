@@ -1,18 +1,11 @@
-// The game as every game endpoint returns it: a copy of the backend's GameResponse (ADR 0010).
-// Types exist only at compile time, so these must be kept in step with the Java records by hand.
+import type { components } from './schema'
 
-export type Color = 'WHITE' | 'BLACK'
+// The game as every game endpoint returns it. The types come from the backend's OpenAPI spec (ADR 0012), generated
+// into schema.ts by `npm run api:types`, so they follow the Java records instead of being a copy of them.
+// The rest of the frontend imports these names, not schema.ts, so it doesn't depend on the generated file's layout.
 
-export type GameStatus = 'IN_PROGRESS' | 'CHECKMATE' | 'STALEMATE' | 'LEFT'
+export type Game = components['schemas']['GameResponse']
 
-export type Game = {
-  id: string
-  fen: string
-  sideToMove: Color
-  check: boolean
-  status: GameStatus
-  /** The winner of a checkmate, otherwise null. */
-  winner: Color | null
-  /** The moves the side to move can play in UCI notation, e.g. "e7e8q"; empty once the game has ended. */
-  legalMoves: string[]
-}
+export type Color = Game['sideToMove']
+
+export type GameStatus = Game['status']
