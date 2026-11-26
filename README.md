@@ -61,8 +61,8 @@ Requirements: JDK 25, Docker, and Node.js in the LTS version from `frontend/.nvm
 4. Open http://localhost:5173 and click **New game**. The frontend's dev server forwards `/api` requests to Spring,
    so the browser only talks to port 5173.
 
-Without Docker Compose, `./gradlew bootTestRun` starts the backend against a throwaway Testcontainers Postgres
-instead of step 1 and 2 (Docker must still be running; games are lost when it stops).
+Without Docker Compose and `.env`, `./gradlew bootTestRun` replaces steps 1 and 2: it starts the backend against a
+throwaway Testcontainers Postgres (Docker must still be running; games are lost when it stops).
 
 The API documentation is at http://localhost:8080/swagger-ui.html, where you can also try the calls.
 
