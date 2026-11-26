@@ -2,18 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from './ApiError'
 import type { Game } from './game'
 import { getGame, leaveGame, playMove, startGame } from './games'
+import { NEW_GAME as GAME } from '../test/games'
 
-const ID = '41052abf-657d-4047-8741-e41cc9c17a9a'
-
-const GAME: Game = {
-  id: ID,
-  fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-  sideToMove: 'WHITE',
-  check: false,
-  status: 'IN_PROGRESS',
-  winner: null,
-  legalMoves: ['e2e4', 'g1f3'],
-}
+const ID = GAME.id
 
 const fetchMock = vi.fn<typeof fetch>()
 

@@ -3,20 +3,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../api/ApiError'
 import type { Game } from '../api/game'
 import { startGame } from '../api/games'
+import { NEW_GAME as GAME } from '../test/games'
 import { renderAt } from '../test/renderAt'
 
 // Replaces every function of the API module with a mock, like @MockitoBean in a Spring test.
 vi.mock('../api/games')
-
-const GAME: Game = {
-  id: '41052abf-657d-4047-8741-e41cc9c17a9a',
-  fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-  sideToMove: 'WHITE',
-  check: false,
-  status: 'IN_PROGRESS',
-  winner: null,
-  legalMoves: ['e2e4', 'g1f3'],
-}
 
 afterEach(() => {
   vi.resetAllMocks()
