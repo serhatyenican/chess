@@ -30,6 +30,14 @@ See `docs/adr/` for the reasoning behind each choice.
 - Configuration and secrets come from environment variables. Locally they live in a
   git-ignored `.env` file (template: `.env.example`), read by both docker-compose and Spring Boot.
 
+## Frontend
+- Lives in `frontend/`; run npm commands there. Node version in `frontend/.nvmrc` (current LTS).
+- Scripts: `npm run dev` (Vite on http://localhost:5173, proxies `/api` to Spring on 8080), `npm run build`
+  (type check + production build), `npm run lint` (oxlint, the Vite template's linter), `npm test` (Vitest, runs once),
+  `npm run test:watch`.
+- Tests sit next to the code they test as `*.test.ts(x)`; shared test setup is in `src/test/setup.ts`.
+  Import `describe`/`it`/`expect` from `vitest` (no globals).
+
 ## Architecture decisions
 Read `docs/adr/` before changing the stack or structure. Record new significant decisions there as a new ADR.
 

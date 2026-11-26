@@ -10,11 +10,11 @@ practices and AI-assisted workflows.
 
 - Java 25, Spring Boot 4, Gradle
 - PostgreSQL (via Docker Compose for local development)
-- React frontend (planned)
+- React, Vite and TypeScript frontend in `frontend/`
 
 ## Run locally
 
-Requirements: JDK 25 and Docker.
+Requirements: JDK 25, Docker and Node.js (the LTS version in `frontend/.nvmrc`).
 
 ```bash
 cp .env.example .env          # then set your own password in .env
@@ -27,6 +27,17 @@ Run the tests with `./gradlew test`. Tests start their own throwaway Postgres wi
 
 Alternatively, `./gradlew bootTestRun` starts the app against a Testcontainers Postgres,
 without docker-compose.
+
+Start the frontend in a second terminal, with Spring running:
+
+```bash
+cd frontend
+npm ci                        # installs the exact versions from package-lock.json
+npm run dev                   # serves the app on http://localhost:5173
+```
+
+The dev server forwards `/api` requests to Spring, so open http://localhost:5173 in the browser.
+In `frontend/`, `npm test` runs the frontend tests and `npm run lint` the linter.
 
 ## License
 
