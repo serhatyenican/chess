@@ -17,7 +17,13 @@ function StartPage() {
       // No setStarting(false) here: this page is replaced by the game page.
       navigate(`/games/${game.id}`)
     } catch (e) {
-      setError(e instanceof ApiError ? e.detail : 'Something went wrong. Please try again.')
+      if (e instanceof ApiError) {
+        setError(e.detail)
+      } else {
+        // Not an API error, so a bug in our own code: keep the stack trace in the browser console.
+        console.error(e)
+        setError('Something went wrong. Please try again.')
+      }
       setStarting(false)
     }
   }

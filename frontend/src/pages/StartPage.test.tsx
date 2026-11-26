@@ -20,6 +20,8 @@ const GAME: Game = {
 
 afterEach(() => {
   vi.resetAllMocks()
+  // Puts back what vi.spyOn replaced, such as console.error.
+  vi.restoreAllMocks()
 })
 
 describe('StartPage', () => {
@@ -64,12 +66,27 @@ describe('StartPage', () => {
     expect(startGame).toHaveBeenCalledTimes(2)
   })
 
-  it('shows a general message for an unexpected error', async () => {
-    vi.mocked(startGame).mockRejectedValue(new Error('boom'))
+  it('shows a general message for an unexpected error, and logs it', async () => {
+    const bug = new Error('boom')
+    vi.mocked(startGame).mockRejectedValue(bug)
+    // Replaced, so the expected error doesn't clutter the test output.
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const { user } = renderAt('/')
 
     await user.click(screen.getByRole('button', { name: 'New game' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.')
+    expect(consoleError).toHaveBeenCalledWith(bug)
+  })
+
+  it('doesn\'t log an API error, since it is expected', async () => {
+    vi.mocked(startGame).mockRejectedValue(ApiError.network(new TypeError('Failed to fetch')))
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const { user } = renderAt('/')
+
+    await user.click(screen.getByRole('button', { name: 'New game' }))
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    expect(consoleError).not.toHaveBeenCalled()
   })
 })
