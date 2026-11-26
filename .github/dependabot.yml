@@ -15,3 +15,37 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    # One PR per week for all minor and patch updates; a major version still gets a PR of its own.
+    groups:
+      frontend:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # The generator of src/api/schema.ts (#97): its own package, since openapi-typescript needs TypeScript 5.
+  # CI doesn't run it. Before merging an update here, run `npm run api:types` in frontend/ with Spring running, and
+  # check that src/api/schema.ts is unchanged (or the change is expected). An openapi-typescript release that supports
+  # TypeScript 7 means the folder can go (see CLAUDE.md).
+  - package-ecosystem: "npm"
+    directory: "/frontend/tools/api-types"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    groups:
+      api-types-tool:
+        update-types:
+          - "minor"
+          - "patch"
+    # openapi-typescript needs TypeScript 5 as its peer, so a newer major version would break the generator.
+    ignore:
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
