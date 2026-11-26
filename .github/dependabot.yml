@@ -28,6 +28,12 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Node itself (frontend/.nvmrc) isn't updated by Dependabot: moving to a new Node version is done by hand, e.g.
+    # when the next LTS arrives. @types/node's major version follows Node's, so raise it together with .nvmrc then.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
 
   # The generator of src/api/schema.ts (#97): its own package, since openapi-typescript needs TypeScript 5.
   # CI doesn't run it. Before merging an update here, run `npm run api:types` in frontend/ with Spring running, and
