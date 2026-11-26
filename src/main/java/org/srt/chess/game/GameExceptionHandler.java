@@ -45,6 +45,11 @@ class GameExceptionHandler {
     }
 
     @ExceptionHandler
+    ProblemDetail statusChangeNotAllowed(StatusChangeNotAllowedException exception) {
+        return problem(HttpStatus.UNPROCESSABLE_CONTENT, "Status change not allowed", exception.getMessage());
+    }
+
+    @ExceptionHandler
     ProblemDetail gameOver(GameOverException exception) {
         return problem(HttpStatus.CONFLICT, "Game over", exception.getMessage());
     }

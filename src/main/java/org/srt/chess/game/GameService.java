@@ -56,6 +56,23 @@ class GameService {
         return GameResponse.of(gameRepository.saveAndFlush(game));
     }
 
+    /**
+     * Changes the status of the game with this id. The only change allowed is leaving: {@code IN_PROGRESS} to
+     * {@code LEFT}. The other endings come from playing moves.
+     *
+     * @throws GameNotFoundException           if there is no such game
+     * @throws StatusChangeNotAllowedException if the requested status is not {@code LEFT}
+     * @throws GameOverException               if the game has already ended
+     */
+    GameResponse changeStatus(UUID id, GameStatus requested) {
+        Game game = find(id);
+        if (requested != GameStatus.LEFT) {
+            throw new StatusChangeNotAllowedException(requested);
+        }
+        game.leave();
+        return GameResponse.of(gameRepository.saveAndFlush(game));
+    }
+
     private Game find(UUID id) {
         return gameRepository.findById(id).orElseThrow(() -> new GameNotFoundException(id));
     }

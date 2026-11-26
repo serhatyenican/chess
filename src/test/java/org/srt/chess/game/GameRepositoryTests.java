@@ -132,6 +132,19 @@ class GameRepositoryTests {
                                 .isTrue());
     }
 
+    @Test
+    void rejectsAMoveInAGameThatAnotherRequestLeftFirst() {
+        Game game = gameRepository.saveAndFlush(Game.start());
+        assertThat(game.moves()).isEmpty();
+
+        // Another request leaves the game first. Leaving adds no move, so only the version check can see it.
+        execute("update games set status = 'LEFT', version = version + 1 where id = ?1", game.id());
+
+        game.play(Move.of("e2e4"));
+        assertThatThrownBy(() -> gameRepository.saveAndFlush(game))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class);
+    }
+
     // The rules below can't be broken through Game, so these tests write SQL directly to check that the database
     // enforces them as well.
 
