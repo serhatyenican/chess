@@ -23,3 +23,11 @@ export const GAME_IN_CHECK: Game = {
   check: true,
   legalMoves: ['g7g6'],
 }
+
+/** After 1. e4: Black to move. */
+export const GAME_AFTER_E4: Game = {
+  ...NEW_GAME,
+  fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+  sideToMove: 'BLACK',
+  legalMoves: ['e7e5', 'e7e6', 'g8f6', 'b8c6'],
+}
