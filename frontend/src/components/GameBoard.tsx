@@ -2,8 +2,9 @@ import { type CSSProperties, useState } from 'react'
 import { Chessboard, type PieceDataType } from 'react-chessboard'
 import type { Game } from '../api/game'
 import { kingSquare } from '../chess/kingSquare'
-import { findMove, hasMoves, targetsFrom } from '../chess/moves'
+import { findMove, hasMoves, promotionsFor, targetsFrom } from '../chess/moves'
 import { CHECK_STYLE, SELECTED_STYLE, TARGET_STYLE } from './boardStyles'
+import PromotionPicker from './PromotionPicker'
 
 type GameBoardProps = {
   game: Game
@@ -15,12 +16,14 @@ type GameBoardProps = {
 
 /**
  * Draws the game's position, White at the bottom, since one person plays both sides (v1). A move is made by
- * dragging a piece, or by clicking it and then a target square. The board only reports the move: the page sends it,
+ * dragging a piece, or by clicking it and then a target square. A pawn reaching the last rank first asks for the piece. The board only reports the move: the page sends it,
  * and the board then shows the position the server answers with (ADR 0006).
  */
 function GameBoard({ game, onMove, disabled }: GameBoardProps) {
   // The square of the selected piece. Only the board cares about it, so it is the board's own state.
   const [selected, setSelected] = useState<string | null>(null)
+  // A pawn move to the last rank that waits for the piece, chosen in the promotion picker.
+  const [promotion, setPromotion] = useState<{ from: string; to: string } | null>(null)
 
   const playable = !disabled && game.status === 'IN_PROGRESS'
   // react-chessboard names pieces like "wP" or "bK": the first letter is the color.
@@ -36,6 +39,8 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
     const move = findMove(game.legalMoves, from, to)
     if (move) {
       onMove(move)
+    } else if (promotionsFor(game.legalMoves, from, to).length > 0) {
+      setPromotion({ from, to })
     }
   }
 
@@ -43,7 +48,7 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
     if (!playable) {
       return
     }
-    if (selected && findMove(game.legalMoves, selected, square)) {
+    if (selected && targetsFrom(game.legalMoves, selected).includes(square)) {
       play(selected, square)
     } else if (canMove(piece, square) && square !== selected) {
       setSelected(square)
@@ -72,6 +77,17 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
           onSquareClick: handleSquareClick,
         }}
       />
+      {promotion && (
+        <PromotionPicker
+          color={game.sideToMove}
+          pieces={promotionsFor(game.legalMoves, promotion.from, promotion.to)}
+          onChoose={(piece) => {
+            setPromotion(null)
+            onMove(promotion.from + promotion.to + piece)
+          }}
+          onCancel={() => setPromotion(null)}
+        />
+      )}
     </div>
   )
 }
