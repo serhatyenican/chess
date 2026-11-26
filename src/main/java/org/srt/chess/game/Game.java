@@ -103,6 +103,18 @@ public class Game {
     }
 
     /**
+     * Ends the game because a player left it. There is no winner, and the game is kept, so its link still shows it.
+     *
+     * @throws GameOverException if the game has already ended
+     */
+    void leave() {
+        if (status != GameStatus.IN_PROGRESS) {
+            throw new GameOverException(id, status);
+        }
+        status = GameStatus.LEFT;
+    }
+
+    /**
      * Adds a move to the game's history, numbered with the next ply. It only records the move, without checking it
      * or changing the position: {@link #play(Move)} is the way to play one. Tests use it to set up a history.
      * <p>
