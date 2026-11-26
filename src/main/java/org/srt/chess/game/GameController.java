@@ -21,10 +21,10 @@ import java.util.UUID;
 @RequestMapping("/api/games")
 class GameController {
 
-    private final GameService service;
+    private final GameService gameService;
 
-    GameController(GameService service) {
-        this.service = service;
+    GameController(GameService gameService) {
+        this.gameService = gameService;
     }
 
     /**
@@ -32,7 +32,7 @@ class GameController {
      */
     @PostMapping
     ResponseEntity<GameResponse> start() {
-        GameResponse game = service.start();
+        GameResponse game = gameService.start();
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(game.id())
@@ -45,6 +45,6 @@ class GameController {
      */
     @GetMapping("/{id}")
     GameResponse get(@PathVariable UUID id) {
-        return service.get(id);
+        return gameService.get(id);
     }
 }
