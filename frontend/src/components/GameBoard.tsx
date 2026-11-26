@@ -2,7 +2,7 @@ import { type CSSProperties, useState } from 'react'
 import { Chessboard, type PieceDataType } from 'react-chessboard'
 import type { Game } from '../api/game'
 import { kingSquare } from '../chess/kingSquare'
-import { findMove, targetsFrom } from '../chess/moves'
+import { findMove, hasMoves, targetsFrom } from '../chess/moves'
 import { CHECK_STYLE, SELECTED_STYLE, TARGET_STYLE } from './boardStyles'
 
 type GameBoardProps = {
@@ -26,6 +26,10 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
   // react-chessboard names pieces like "wP" or "bK": the first letter is the color.
   const sideToMove = game.sideToMove === 'WHITE' ? 'w' : 'b'
   const isOwnPiece = (piece: PieceDataType | null) => piece?.pieceType.startsWith(sideToMove) ?? false
+  // Only a piece of the side to move that has a legal move can be picked up: a blocked or pinned piece can't, and in
+  // check only the pieces that can get out of it light up.
+  const canMove = (piece: PieceDataType | null, square: string | null) =>
+    square !== null && isOwnPiece(piece) && hasMoves(game.legalMoves, square)
 
   function play(from: string, to: string) {
     setSelected(null)
@@ -41,7 +45,7 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
     }
     if (selected && findMove(game.legalMoves, selected, square)) {
       play(selected, square)
-    } else if (isOwnPiece(piece) && square !== selected) {
+    } else if (canMove(piece, square) && square !== selected) {
       setSelected(square)
     } else {
       setSelected(null)
@@ -57,7 +61,7 @@ function GameBoard({ game, onMove, disabled }: GameBoardProps) {
           position: game.fen,
           boardOrientation: 'white',
           squareStyles: squareStyles(game, selected),
-          canDragPiece: ({ piece }) => playable && isOwnPiece(piece),
+          canDragPiece: ({ piece, square }) => playable && canMove(piece, square),
           onPieceDrop: ({ sourceSquare, targetSquare }) => {
             if (targetSquare) {
               play(sourceSquare, targetSquare)

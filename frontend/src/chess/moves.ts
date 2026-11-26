@@ -2,6 +2,14 @@
 // The board has no rules of its own: a move is possible exactly when the server listed it.
 
 /**
+ * Returns whether the piece on this square has any legal move, so it can be selected or dragged. Promotions count:
+ * a pawn whose only moves are promotions can still be picked up.
+ */
+export function hasMoves(legalMoves: string[], from: string): boolean {
+  return legalMoves.some((move) => move.startsWith(from))
+}
+
+/**
  * Returns the squares the piece on this square can move to, such as ["e3", "e4"] for "e2" at the start.
  * Promotion moves ("e7e8q") are left out until the board can ask for the piece (#88).
  */

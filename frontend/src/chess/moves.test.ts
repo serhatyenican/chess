@@ -1,7 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { findMove, targetsFrom } from './moves'
+import { findMove, hasMoves, targetsFrom } from './moves'
 
 const START = ['b1a3', 'b1c3', 'g1f3', 'g1h3', 'e2e3', 'e2e4', 'd2d3', 'd2d4']
+
+describe('hasMoves', () => {
+  it('is true for a piece with a legal move', () => {
+    expect(hasMoves(START, 'e2')).toBe(true)
+    expect(hasMoves(START, 'g1')).toBe(true)
+  })
+
+  it('is false for a piece without one, or an empty square', () => {
+    expect(hasMoves(START, 'a1')).toBe(false)
+    expect(hasMoves(START, 'e5')).toBe(false)
+  })
+
+  it('counts promotions', () => {
+    expect(hasMoves(['e7e8q', 'e7e8n'], 'e7')).toBe(true)
+  })
+})
 
 describe('targetsFrom', () => {
   it('lists the squares a piece can move to', () => {

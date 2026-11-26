@@ -93,6 +93,25 @@ describe('playing a move by clicking', () => {
     expect(hasMark('g6', TARGET_STYLE)).toBe(true)
   })
 
+  it('doesn\'t select a piece without a legal move', async () => {
+    const { user } = await openGame(NEW_GAME_WITH_E2_MOVES)
+
+    // The rook on a1 is blocked at the start.
+    await user.click(square('a1'))
+
+    expect(hasMark('a1', SELECTED_STYLE)).toBe(false)
+  })
+
+  it('in check, only selects the pieces that can get out of it', async () => {
+    const { user } = await openGame(GAME_IN_CHECK)
+
+    await user.click(square('d7'))
+    expect(hasMark('d7', SELECTED_STYLE)).toBe(false)
+
+    await user.click(square('g7'))
+    expect(hasMark('g7', SELECTED_STYLE)).toBe(true)
+  })
+
   it('takes no new move while a move is being sent', async () => {
     const { user } = await openGame(NEW_GAME_WITH_E2_MOVES)
     vi.mocked(playMove).mockReturnValue(new Promise(() => {}))
