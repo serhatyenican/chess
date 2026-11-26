@@ -23,7 +23,7 @@ const NEW_GAME_WITH_E2_MOVES: Game = { ...NEW_GAME, legalMoves: ['e2e3', 'e2e4',
 async function openGame(game: Game) {
   vi.mocked(getGame).mockResolvedValue(game)
   const rendered = renderAt(`/games/${game.id}`)
-  await screen.findByText(/to move/)
+  await screen.findByText(/(White|Black) to move/)
   return rendered
 }
 
