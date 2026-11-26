@@ -37,3 +37,8 @@ management:
     web:
       exposure:
         include: health
+
+# OpenAPI spec at /v3/api-docs and Swagger UI at /swagger-ui.html (ADR 0012).
+springdoc:
+  # The controllers declare no `produces`, so springdoc would document every answer as */*.
+  default-produces-media-type: application/json
