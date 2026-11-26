@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.tuple;
 class GameRepositoryTests {
 
     @Autowired
-    GameRepository games;
+    GameRepository gameRepository;
 
     @Autowired
     TestEntityManager entityManager;
@@ -54,7 +54,7 @@ class GameRepositoryTests {
 
         // save() returns the same object only if it inserts the game (persist). If it took the game for an existing
         // one, it would merge it and return a copy. This pins the Long version in Game (ADR 0011).
-        assertThat(games.save(game)).isSameAs(game);
+        assertThat(gameRepository.save(game)).isSameAs(game);
     }
 
     @Test
@@ -62,10 +62,10 @@ class GameRepositoryTests {
         Game game = Game.start();
         game.addMove(Move.of("e2e4"));
         game.addMove(Move.of("e7e5"));
-        games.saveAndFlush(game);
+        gameRepository.saveAndFlush(game);
         entityManager.clear();
 
-        Game loaded = games.findById(game.id()).orElseThrow();
+        Game loaded = gameRepository.findById(game.id()).orElseThrow();
 
         assertThat(loaded).isNotSameAs(game);
         assertThat(loaded.status()).isEqualTo(GameStatus.IN_PROGRESS);
@@ -87,31 +87,31 @@ class GameRepositoryTests {
         first.addMove(Move.of("e2e4"));
         Game second = Game.start();
         second.addMove(Move.of("d2d4"));
-        games.saveAndFlush(first);
-        games.saveAndFlush(second);
+        gameRepository.saveAndFlush(first);
+        gameRepository.saveAndFlush(second);
         entityManager.clear();
 
-        assertThat(games.findById(first.id()).orElseThrow().moves()).extracting(GameMove::ply).containsExactly(1);
-        assertThat(games.findById(second.id()).orElseThrow().moves()).extracting(GameMove::ply).containsExactly(1);
+        assertThat(gameRepository.findById(first.id()).orElseThrow().moves()).extracting(GameMove::ply).containsExactly(1);
+        assertThat(gameRepository.findById(second.id()).orElseThrow().moves()).extracting(GameMove::ply).containsExactly(1);
     }
 
     @Test
     void findsNoGameForAnUnknownId() {
-        assertThat(games.findById(UUID.randomUUID())).isEmpty();
+        assertThat(gameRepository.findById(UUID.randomUUID())).isEmpty();
     }
 
     @Test
     void rejectsSavingAGameThatChangedInTheMeantime() {
-        UUID id = games.saveAndFlush(Game.start()).id();
+        UUID id = gameRepository.saveAndFlush(Game.start()).id();
         entityManager.clear();
-        Game stale = games.findById(id).orElseThrow();
+        Game stale = gameRepository.findById(id).orElseThrow();
         entityManager.detach(stale);
 
         // Another request saves the game in the meantime, which increases its version.
         execute("update games set version = version + 1 where id = ?1", id);
 
         // The stale copy still has the old version, so saving it must fail instead of overwriting that change.
-        assertThatThrownBy(() -> games.saveAndFlush(stale))
+        assertThatThrownBy(() -> gameRepository.saveAndFlush(stale))
                 .isInstanceOf(ObjectOptimisticLockingFailureException.class);
     }
 
@@ -122,7 +122,7 @@ class GameRepositoryTests {
     void rejectsASecondMoveWithTheSamePly() {
         Game game = Game.start();
         game.addMove(Move.of("e2e4"));
-        games.saveAndFlush(game);
+        gameRepository.saveAndFlush(game);
 
         assertThatThrownBy(() -> execute(
                 "insert into moves (game_id, ply, move, played_at) values (?1, 1, 'd2d4', now())", game.id()))
@@ -132,7 +132,7 @@ class GameRepositoryTests {
 
     @Test
     void rejectsAMoveWithoutAPositivePly() {
-        Game game = games.saveAndFlush(Game.start());
+        Game game = gameRepository.saveAndFlush(Game.start());
 
         assertThatThrownBy(() -> execute(
                 "insert into moves (game_id, ply, move, played_at) values (?1, 0, 'e2e4', now())", game.id()))
@@ -150,7 +150,7 @@ class GameRepositoryTests {
             "LEFT,        WHITE, games_winner_only_on_checkmate",
     })
     void rejectsAnInvalidStatusAndWinner(String status, String winner, String constraint) {
-        Game game = games.saveAndFlush(Game.start());
+        Game game = gameRepository.saveAndFlush(Game.start());
 
         assertThatThrownBy(() -> execute(
                 "update games set status = ?2, winner = ?3 where id = ?1", game.id(), status, winner))
@@ -166,12 +166,12 @@ class GameRepositoryTests {
             "LEFT,      none",
     })
     void acceptsAValidStatusAndWinner(String status, String winner) {
-        Game game = games.saveAndFlush(Game.start());
+        Game game = gameRepository.saveAndFlush(Game.start());
 
         execute("update games set status = ?2, winner = ?3 where id = ?1", game.id(), status, winner);
         entityManager.clear();
 
-        Game loaded = games.findById(game.id()).orElseThrow();
+        Game loaded = gameRepository.findById(game.id()).orElseThrow();
         assertThat(loaded.status()).isEqualTo(GameStatus.valueOf(status));
         assertThat(loaded.winner().map(Enum::name)).isEqualTo(Optional.ofNullable(winner));
     }

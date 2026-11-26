@@ -18,6 +18,13 @@ spring:
       # Flyway owns the schema (ADR 0005); Hibernate only checks that entities match it.
       ddl-auto: validate
     show-sql: true
+    # Off: no database session for the whole HTTP request. The service maps entities to responses inside its
+    # transaction, so a lazy load in the web layer fails loudly instead of quietly running queries.
+    open-in-view: false
+  mvc:
+    # Errors as RFC 9457 problem details, e.g. a malformed id (ADR 0010).
+    problemdetails:
+      enabled: true
 
 # Actuator: expose only health over HTTP. Other endpoints (env, beans, ...) can leak internals.
 management:
