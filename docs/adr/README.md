@@ -19,3 +19,5 @@ To start a new one, copy [`template.md`](template.md) and give it the next numbe
 | [0009](0009-single-module-pure-engine-package.md) | Single Gradle module, engine package without Spring | Accepted |
 | [0010](0010-rest-api-design.md) | REST API around resources: plural names, nested moves, PATCH for state changes | Accepted |
 | [0011](0011-store-moves-as-uci-text.md) | Position as FEN, moves as UCI text, optimistic locking on games | Accepted |
+
+<!-- Throwaway change to try the docs-only CI path again (#66). Never merged. -->
