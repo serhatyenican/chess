@@ -1,24 +1,14 @@
 package org.srt.chess.game;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.web.ErrorResponseException;
-
 import java.util.UUID;
 
 /**
- * Thrown when no game has the requested id. As an {@link ErrorResponseException}, Spring MVC answers it with a 404
- * problem detail by itself, so it needs no exception handler.
+ * Thrown when no game has the requested id. It carries no HTTP status, so callers other than the REST API, such as
+ * the STOMP handlers of v2, can use it too. {@link GameExceptionHandler} turns it into a 404.
  */
-class GameNotFoundException extends ErrorResponseException {
+class GameNotFoundException extends RuntimeException {
 
     GameNotFoundException(UUID id) {
-        super(HttpStatus.NOT_FOUND, problem(id), null);
-    }
-
-    private static ProblemDetail problem(UUID id) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "No game with id " + id);
-        problem.setTitle("Game not found");
-        return problem;
+        super("No game with id " + id);
     }
 }
