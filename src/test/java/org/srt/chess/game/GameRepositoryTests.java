@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
@@ -113,6 +114,22 @@ class GameRepositoryTests {
         // The stale copy still has the old version, so saving it must fail instead of overwriting that change.
         assertThatThrownBy(() -> gameRepository.saveAndFlush(stale))
                 .isInstanceOf(ObjectOptimisticLockingFailureException.class);
+    }
+
+    @Test
+    void rejectsAMoveThatAnotherRequestStoredFirst() {
+        Game game = gameRepository.saveAndFlush(Game.start());
+        assertThat(game.moves()).isEmpty();
+
+        // Another request stores its first move before this one: the same race as two tabs playing at once.
+        execute("insert into moves (game_id, ply, move, played_at) values (?1, 1, 'd2d4', now())", game.id());
+
+        game.play(Move.of("e2e4"));
+        assertThatThrownBy(() -> gameRepository.saveAndFlush(game))
+                .isInstanceOfSatisfying(DataIntegrityViolationException.class, exception ->
+                        assertThat(GameExceptionHandler.violates(exception, GameExceptionHandler.ONE_MOVE_PER_PLY))
+                                .as("recognized as a race by the exception handler")
+                                .isTrue());
     }
 
     // The rules below can't be broken through Game, so these tests write SQL directly to check that the database

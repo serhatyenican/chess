@@ -1,10 +1,14 @@
 package org.srt.chess.game;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -14,8 +18,8 @@ import java.util.UUID;
 /**
  * The game resource (ADR 0010). It only maps HTTP to {@link GameService} and back.
  * <p>
- * Errors are problem details: 404 for an unknown game (see {@link GameExceptionHandler}), and 400 for an id that is
- * not a UUID, which Spring MVC reports by itself when it can't convert the path variable.
+ * Errors are problem details. {@link GameExceptionHandler} maps the game's own errors. Spring MVC reports malformed
+ * requests as 400 by itself: an id that is not a UUID, a missing body, or a blank {@code move}.
  */
 @RestController
 @RequestMapping("/api/games")
@@ -46,5 +50,15 @@ class GameController {
     @GetMapping("/{id}")
     GameResponse get(@PathVariable UUID id) {
         return gameService.get(id);
+    }
+
+    /**
+     * Plays a move, e.g. {@code {"move": "e7e8q"}}, and answers 201 with the updated game. A move gets no URL of its
+     * own in v1, so there is no {@code Location} header.
+     */
+    @PostMapping("/{id}/moves")
+    @ResponseStatus(HttpStatus.CREATED)
+    GameResponse play(@PathVariable UUID id, @Valid @RequestBody PlayMoveRequest request) {
+        return gameService.play(id, request.move());
     }
 }

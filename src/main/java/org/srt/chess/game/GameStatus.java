@@ -1,5 +1,7 @@
 package org.srt.chess.game;
 
+import org.srt.chess.engine.GameState;
+
 /**
  * Whether a stored game goes on, and if not, how it ended.
  * <p>
@@ -11,5 +13,16 @@ public enum GameStatus {
     IN_PROGRESS,
     CHECKMATE,
     STALEMATE,
-    LEFT
+    LEFT;
+
+    /**
+     * Returns the status for the engine's judgement of a position. A position alone never means {@link #LEFT}.
+     */
+    static GameStatus from(GameState state) {
+        return switch (state) {
+            case IN_PROGRESS -> IN_PROGRESS;
+            case CHECKMATE -> CHECKMATE;
+            case DRAW -> STALEMATE;
+        };
+    }
 }
