@@ -1,0 +1,10 @@
+{
+  "name": "chess-api-types-tool",
+  "private": true,
+  "description": "Generates src/api/schema.ts from the backend's OpenAPI spec. A separate package because openapi-typescript needs TypeScript 5 as a peer, while the frontend uses TypeScript 7.",
+  "type": "module",
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -40,6 +40,11 @@ See `docs/adr/` for the reasoning behind each choice.
   `npm run test:watch`.
 - Tests sit next to the code they test as `*.test.ts(x)`; shared test setup is in `src/test/setup.ts`.
   Import `describe`/`it`/`expect` from `vitest` (no globals).
+- API types are generated from the backend's OpenAPI spec into `src/api/schema.ts` (committed, never edited by hand);
+  `src/api/game.ts` gives them the names the code uses. After changing an API record or its annotations, run
+  `npm run api:types` with Spring running, and commit the result together with the backend change.
+  The generator lives in its own package, `tools/api-types/`, because `openapi-typescript` needs TypeScript 5 as a
+  peer while the frontend uses TypeScript 7. Once it supports TypeScript 7, move it into the frontend's devDependencies.
 
 ## Architecture decisions
 Read `docs/adr/` before changing the stack or structure. Record new significant decisions there as a new ADR.
