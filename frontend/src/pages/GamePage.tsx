@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router'
 import { ApiError } from '../api/ApiError'
 import type { Color, Game, GameStatus as Status } from '../api/game'
 import { getGame, playMove } from '../api/games'
+import { capturedPieces } from '../chess/capturedPieces'
+import CapturedPieces from '../components/CapturedPieces'
 import GameBoard from '../components/GameBoard'
 import NewGameButton from '../components/NewGameButton'
 
@@ -102,11 +104,16 @@ function LoadedGame({ initialGame }: { initialGame: Game }) {
     }
   }
 
+  const captured = capturedPieces(game.fen)
+
+  // Each side's captures next to its own side of the board: Black's above, White's below (White is at the bottom).
   return (
     <>
       <GameStatus game={game} />
       {moveError && <p role="alert">{moveError}</p>}
+      <CapturedPieces by="BLACK" captures={captured.BLACK} lead={captured.BLACK.points - captured.WHITE.points} />
       <GameBoard game={game} onMove={handleMove} disabled={sending} />
+      <CapturedPieces by="WHITE" captures={captured.WHITE} lead={captured.WHITE.points - captured.BLACK.points} />
     </>
   )
 }
