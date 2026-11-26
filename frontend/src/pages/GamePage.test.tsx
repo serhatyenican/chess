@@ -67,11 +67,16 @@ describe('GamePage', () => {
     expect(isHighlighted('e1')).toBe(false)
   })
 
-  it('shows "Game not found" for an unknown id', async () => {
-    vi.mocked(getGame).mockRejectedValue(new ApiError(404, 'Game not found', 'No game with id 1'))
-    const { user } = renderAt('/games/1')
+  // What the backend answers (checked with curl): 400 for an id that isn't a UUID, 404 for an unknown UUID.
+  it.each([
+    ['an id that is not a UUID', '1', new ApiError(400, 'Bad Request', "Failed to convert 'id' with value: '1'")],
+    ['an unknown id', NEW_GAME.id, new ApiError(404, 'Game not found', `No game with id ${NEW_GAME.id}`)],
+  ])('shows "Game not found" for %s', async (_case, id, error) => {
+    vi.mocked(getGame).mockRejectedValue(error)
+    const { user } = renderAt(`/games/${id}`)
 
     expect(await screen.findByRole('heading', { name: 'Game not found' })).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: 'Back to the start page' }))
 

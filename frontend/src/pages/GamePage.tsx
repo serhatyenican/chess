@@ -17,6 +17,12 @@ type PageState =
 
 const COLOR_NAMES: Record<Color, string> = { WHITE: 'White', BLACK: 'Black' }
 
+/**
+ * Both mean that there is no game behind the link: 404 for an unknown id, 400 for one that isn't a UUID at all (a
+ * typo, or a link cut off when copied). Loading a game sends nothing but the id, so a 400 can't mean anything else.
+ */
+const NOT_FOUND_STATUSES: (number | null)[] = [400, 404]
+
 /** The game page, opened by a game's link: loads the game and shows its position. */
 function GamePage() {
   // The route only matches with an id, so it is always there.
@@ -89,7 +95,7 @@ function GameStatus({ game }: { game: Game }) {
 
 function failedState(e: unknown): PageState {
   if (e instanceof ApiError) {
-    return e.status === 404 ? { kind: 'notFound' } : { kind: 'failed', message: e.detail }
+    return NOT_FOUND_STATUSES.includes(e.status) ? { kind: 'notFound' } : { kind: 'failed', message: e.detail }
   }
   // Not an API error, so a bug in our own code: keep the stack trace in the browser console.
   console.error(e)
