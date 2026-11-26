@@ -14,3 +14,12 @@ export const NEW_GAME: Game = {
   winner: null,
   legalMoves: ['e2e4', 'g1f3'],
 }
+
+/** After 1. e4 f6 2. Qh5+, as the API answered it: Black is in check, and g7g6 is the only way out. */
+export const GAME_IN_CHECK: Game = {
+  ...NEW_GAME,
+  fen: 'rnbqkbnr/ppppp1pp/5p2/7Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2',
+  sideToMove: 'BLACK',
+  check: true,
+  legalMoves: ['g7g6'],
+}
