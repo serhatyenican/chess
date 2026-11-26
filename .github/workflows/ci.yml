@@ -16,9 +16,9 @@ permissions:
   pull-requests: read
 
 jobs:
-  # Decides whether the builds are needed. "Build and test" and "Frontend" are required checks on main, so the workflow must always
-  # start: with paths-ignore on the trigger, a docs-only PR would wait forever for the check. A job skipped by its
-  # `if`, however, counts as passed.
+  # Decides whether the builds are needed. "Build and test" and "Frontend" are required checks on main, so the
+  # workflow must always start: with paths-ignore on the trigger, a docs-only PR would wait forever for the checks.
+  # A job skipped by its `if`, however, counts as passed.
   changes:
     name: Detect changes
     runs-on: ubuntu-latest
