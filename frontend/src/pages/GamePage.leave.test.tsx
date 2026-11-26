@@ -81,6 +81,17 @@ describe('leaving a game', () => {
     expect(leaveButton()).toBeEnabled()
   })
 
+  it('stays open on a click on its text', async () => {
+    const { user } = await openGame(NEW_GAME)
+
+    await user.click(leaveButton())
+    // Inside the dialog, so no click outside.
+    await user.click(within(confirmation()).getByText(/can't be continued/))
+
+    expect(confirmation()).toBeInTheDocument()
+    expect(leaveGame).not.toHaveBeenCalled()
+  })
+
   it('shows no Leave button for a finished game', async () => {
     await openGame(GAME_CHECKMATE)
 
