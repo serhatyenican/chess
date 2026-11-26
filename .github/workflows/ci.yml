@@ -45,8 +45,10 @@ jobs:
     # The required check has this name: keep it.
     name: Build and test
     needs: changes
-    # Pushes to main always build, as a safety net.
-    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
+    # Build when code changed, on every push to main as a safety net, and whenever Detect changes didn't succeed:
+    # a job skipped because its `needs` failed also counts as passed, so without that a code PR could merge without
+    # a build. `!cancelled()` replaces the implicit success() check, so this is evaluated even when `changes` failed.
+    if: ${{ !cancelled() && (github.event_name == 'push' || needs.changes.result != 'success' || needs.changes.outputs.code == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
