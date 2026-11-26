@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { defaultPieces } from 'react-chessboard'
 import type { Color } from '../api/game'
+import { pieceLetter } from '../chess/colors'
 import type { PromotionPiece } from '../chess/moves'
 
 type PromotionPickerProps = {
@@ -55,7 +56,7 @@ function PromotionPicker({ color, pieces, onChoose, onCancel }: PromotionPickerP
             onClick={() => onChoose(piece)}
             style={{ width: 64, height: 64, padding: 4, cursor: 'pointer' }}
           >
-            {defaultPieces[`${color === 'WHITE' ? 'w' : 'b'}${piece.toUpperCase()}`]()}
+            {defaultPieces[`${pieceLetter(color)}${piece.toUpperCase()}`]()}
           </button>
         ))}
       </div>

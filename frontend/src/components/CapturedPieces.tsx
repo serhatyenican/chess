@@ -1,8 +1,8 @@
 import { defaultPieces } from 'react-chessboard'
 import type { Color } from '../api/game'
 import type { Captures, PieceKind } from '../chess/capturedPieces'
+import { colorName, opponent, pieceLetter } from '../chess/colors'
 
-const COLOR_NAMES: Record<Color, string> = { WHITE: 'White', BLACK: 'Black' }
 const PIECE_NAMES: Record<PieceKind, string> = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen' }
 
 type CapturedPiecesProps = {
@@ -19,13 +19,12 @@ type CapturedPiecesProps = {
  * tests) can read them.
  */
 function CapturedPieces({ by, captures, lead }: CapturedPiecesProps) {
-  const opponent: Color = by === 'WHITE' ? 'BLACK' : 'WHITE'
-  const colorLetter = opponent === 'WHITE' ? 'w' : 'b'
+  const taken = opponent(by)
 
   return (
     <div
       role="group"
-      aria-label={`Captured by ${COLOR_NAMES[by]}`}
+      aria-label={`Captured by ${colorName(by)}`}
       style={{ display: 'flex', alignItems: 'center', gap: 2, minHeight: 28 }}
     >
       {captures.pieces.map((piece, index) => (
@@ -33,10 +32,10 @@ function CapturedPieces({ by, captures, lead }: CapturedPiecesProps) {
           // The same piece can appear several times, so its position in the list keeps the keys unique.
           key={`${piece}-${index}`}
           role="img"
-          aria-label={`${COLOR_NAMES[opponent]} ${PIECE_NAMES[piece]}`}
+          aria-label={`${colorName(taken)} ${PIECE_NAMES[piece]}`}
           style={{ width: 24, height: 24 }}
         >
-          {defaultPieces[`${colorLetter}${piece.toUpperCase()}`]()}
+          {defaultPieces[`${pieceLetter(taken)}${piece.toUpperCase()}`]()}
         </span>
       ))}
       <span style={{ marginLeft: 6, fontWeight: 'bold' }}>{formatLead(lead)}</span>
