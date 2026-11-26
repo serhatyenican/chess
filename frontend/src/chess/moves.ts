@@ -29,12 +29,16 @@ export function findMove(legalMoves: string[], from: string, to: string): string
   return legalMoves.find((move) => move === from + to)
 }
 
+/** The order the picker shows the pieces in, strongest first. The UI's own choice, not the server's move order. */
+const PROMOTION_ORDER: PromotionPiece[] = ['q', 'r', 'b', 'n']
+
 /**
- * Returns the pieces a pawn can become by moving from one square to another, such as ["q", "r", "b", "n"], or an
- * empty list if that move is no promotion.
+ * Returns the pieces a pawn can become by moving from one square to another, in the order queen, rook, bishop,
+ * knight, or an empty list if that move is no promotion.
  */
 export function promotionsFor(legalMoves: string[], from: string, to: string): PromotionPiece[] {
-  return legalMoves
+  const pieces = legalMoves
     .filter((move) => move.length === 5 && move.startsWith(from + to))
-    .map((move) => move[4] as PromotionPiece)
+    .map((move) => move[4])
+  return PROMOTION_ORDER.filter((piece) => pieces.includes(piece))
 }
