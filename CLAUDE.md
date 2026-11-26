@@ -34,7 +34,8 @@ See `docs/adr/` for the reasoning behind each choice.
   git-ignored `.env` file (template: `.env.example`), read by both docker-compose and Spring Boot.
 
 ## Frontend
-- Lives in `frontend/`; run npm commands there. Node version in `frontend/.nvmrc` (current LTS).
+- Lives in `frontend/`; run npm commands there. Node version in `frontend/.nvmrc` (current LTS). Dependabot doesn't
+  update Node: when moving to a new LTS, raise `.nvmrc` and the major version of `@types/node` together.
 - Scripts: `npm run dev` (Vite on http://localhost:5173, proxies `/api` to Spring on 8080), `npm run build`
   (type check + production build), `npm run lint` (oxlint, the Vite template's linter), `npm test` (Vitest, runs once),
   `npm run test:watch`.
