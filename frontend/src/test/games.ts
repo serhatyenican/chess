@@ -61,3 +61,11 @@ export const GAME_STALEMATE: Game = {
 
 /** A game that was left right at the start, as the API answers it. */
 export const GAME_LEFT: Game = { ...NEW_GAME, status: 'LEFT', legalMoves: [] }
+
+/** After 1. e4 d5 2. exd5, as the API answered it: White has taken a pawn. */
+export const GAME_AFTER_CAPTURE: Game = {
+  ...NEW_GAME,
+  fen: 'rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2',
+  sideToMove: 'BLACK',
+  legalMoves: ['d8d5', 'g8f6', 'c7c6'],
+}
